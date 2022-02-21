@@ -122,24 +122,3 @@ let event = {
     timeZone: "Turkey",
   },
 };
-
-//insertEvent(event);
-/*let start = "2022-01-01T00:00:00.000Z";
-let end = "2024-01-01T00:00:00.000Z";
-getEvents(start, end)
-  .then((res) => {
-    console.log(res);
-  })
-  .catch((err) => {
-    console.log(err);
-  });*/
-
-/*let eventID = "hpftfc0fgq1qq2qtvu2sd0n3hg";
-deleteEvent(eventID)
-  .then((res) => {
-    console.log(res);
-  })
-  .catch((err) => {
-    console.log(err);
-  });
-*/
