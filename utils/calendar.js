@@ -110,15 +110,21 @@ const deleteEvent = async (eventId) => {
   }
 };
 
-let event = {
-  summary: `summary test`,
-  description: `description test`,
-  start: {
-    dateTime: dateTime["start"],
-    timeZone: "Turkey",
-  },
-  end: {
-    dateTime: dateTime["end"],
-    timeZone: "Turkey",
-  },
+// let event = {
+//   summary: `summary test`,
+//   description: `description test`,
+//   start: {
+//     dateTime: dateTime["start"],
+//     timeZone: "Turkey",
+//   },
+//   end: {
+//     dateTime: dateTime["end"],
+//     timeZone: "Turkey",
+//   },
+// };
+
+module.exports = {
+  insertEvent,
+  deleteEvent,
+  getEvents,
 };
