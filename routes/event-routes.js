@@ -4,11 +4,11 @@ const {addEvent, getAllEvents, getEvent, updateEvent, deleteEvent} = require('..
 
 const router = express.Router();
 
-router.post('/add', addEvent);
-router.get('/get', getAllEvents);
-router.get('/get/:eventId', getEvent);
-router.put('/update/:eventId', updateEvent);
-router.delete('/delete/:eventId', deleteEvent);
+router.post('/events', addEvent);
+router.get('/events', getAllEvents);
+router.get('/events/:eventId', getEvent);
+router.put('/events/:eventId', updateEvent);
+router.delete('/events/:eventId', deleteEvent);
 
 module.exports = {
     routes: router,

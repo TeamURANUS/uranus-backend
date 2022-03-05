@@ -2,14 +2,14 @@ var express = require("express");
 var path = require("path");
 var createError = require("http-errors");
 
-var router = require("./routes/index");
-
 var app = express();
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/", router);
+app.get("/", function (req, res, next) {
+  res.send("home page msg");
+});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
