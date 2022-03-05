@@ -54,5 +54,7 @@ const subNewScrapper = () => {
         });
 }
 
-latestNewScrapper();
-subNewScrapper();
+module.exports = {
+    latestNewScrapper,
+    subNewScrapper
+}
