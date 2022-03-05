@@ -3,11 +3,11 @@ const { addUser, getAllUsers, getUser, updateUser, deleteUser} = require('../con
 
 const router = express.Router();
 
-router.post('/users', addUser);
-router.get('/users', getAllUsers);
-router.get('/users/:userId', getUser);
-router.put('/users/:userId', updateUser);
-router.delete('/users/:userId', deleteUser);
+router.post('/', addUser);
+router.get('/', getAllUsers);
+router.get('/:userId', getUser);
+router.put('/:userId', updateUser);
+router.delete('/:userId', deleteUser);
 
 module.exports = {
     routes: router,
