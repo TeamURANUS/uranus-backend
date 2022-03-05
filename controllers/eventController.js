@@ -1,4 +1,4 @@
-const firebase = require("../firedb");
+const firebase = require("../utils/firedb");
 const firestore = require("firebase/firestore/lite");
 const Event = require("../models/event");
 

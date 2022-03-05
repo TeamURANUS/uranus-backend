@@ -1,4 +1,4 @@
-const firebase = require("../firedb");
+const firebase = require("../utils/firedb");
 const firestore = require("firebase/firestore/lite");
 const User = require("../models/user");
 
@@ -30,8 +30,7 @@ const getAllUsers = async (req, res, next) => {
       res.status(404).json({
         messsage: "No user record found.",
       });
-    }
-    else {
+    } else {
       data.forEach((doc) => {
         const user = new User(
           doc.id,
@@ -116,9 +115,9 @@ const deleteUser = async (req, res, next) => {
 };
 
 module.exports = {
-  addUser,
-  getAllUsers,
-  getUser,
-  updateUser,
-  deleteUser,
+    addUser,
+    getAllUsers,
+    getUser,
+    updateUser,
+    deleteUser,
 };
