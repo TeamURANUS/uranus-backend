@@ -3,6 +3,7 @@ const {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  sendEmailVerification,
 } = require("firebase/auth");
 // https://firebase.google.com/docs/auth/web/start
 
@@ -14,15 +15,19 @@ const register = async (req, res, next) => {
   await createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       const user = userCredential.user;
+
+      sendEmailVerification(user).catch((error) => {
+        console.log(error); // TODO
+      });
+
       res.status(201).json({
         message: "user is created",
         data: user,
       });
     })
     .catch((error) => {
-      const errorCode = error.code;
       const errorMessage = error.message;
-      res.status(errorCode).json({
+      res.status(500).json({
         message: errorMessage,
       });
     });
