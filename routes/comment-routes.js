@@ -3,11 +3,11 @@ const { addComment, getAllComments, getComment, updateComment, deleteComment} = 
 
 const router = express.Router();
 
-router.post('/add-comment', addComment);
-router.get('/get-comments', getAllComments);
-router.get('/get-comment/:commentId', getComment);
-router.put('/update-comment/:commentId', updateComment);
-router.delete('/delete-comment/:commentId', deleteComment);
+router.post('/add', addComment);
+router.get('/get', getAllComments);
+router.get('/get/:commentId', getComment);
+router.put('/update/:commentId', updateComment);
+router.delete('/delete/:commentId', deleteComment);
 
 module.exports = {
     routes: router,
