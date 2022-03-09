@@ -1,11 +1,11 @@
 const { google } = require("googleapis");
-require("dotenv").config();
 
-const CREDENTIALS = JSON.parse(process.env.CREDENTIALS);
-const calendarId = process.env.CALENDAR_ID;
+const { calendarId, CREDENTIALS } = require("./config");
 
 const SCOPES = "https://www.googleapis.com/auth/calendar";
 const calendar = google.calendar({ version: "v3" });
+
+CREDENTIALS.private_key = CREDENTIALS.private_key.replace(/\\n/g, "\n");
 
 const auth = new google.auth.JWT(
   CREDENTIALS.client_email,
@@ -58,6 +58,7 @@ const insertEvent = async (event) => {
       auth: auth,
       calendarId: calendarId,
       resource: event,
+      sendUpdates: "all",
     });
 
     if (response["status"] == 200 && response["statusText"] === "OK") {
@@ -127,4 +128,5 @@ module.exports = {
   insertEvent,
   deleteEvent,
   getEvents,
+  dateTimeForCalendar,
 };
