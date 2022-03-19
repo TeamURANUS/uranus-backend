@@ -1,4 +1,4 @@
-const firebase = require("../firedb");
+const firebase = require("../utils/firedb");
 const firestore = require("firebase/firestore/lite");
 const New = require("../models/new");
 
@@ -20,29 +20,13 @@ const addNew = async (req, res, next) => {
 
 const getAllNews = async (req, res, next) => {
     try {
-        const allNews = [];
+        const allNews = await getAllNewsFromDB();
 
-        const db = firestore.getFirestore(firebase);
-        const newsDB = await firestore.collection(db, "news");
-        const data = await firestore.getDocs(newsDB);
-
-        if (data.empty) {
+        if (allNews.empty) {
             res.status(404).json({
                 messsage: "No New record found.",
             });
         } else {
-            data.forEach((doc) => {
-                const _new = new New(
-                    doc.id,
-                    doc.data().documentAuthor,
-                    doc.data().documentContent,
-                    doc.data().documentDate,
-                    doc.data().documentId,
-                    doc.data().documentTags,
-                    doc.data().documentTitle,
-                );
-                allNews.push(_new);
-            });
             res.status(200).json({
                 data: allNews,
             });
@@ -112,10 +96,54 @@ const deleteNew = async (req, res, next) => {
     }
 };
 
+const getNewsByAuthor = async (req, res, next) => {
+    try {
+        const userId = req.params.userId;
+        const allNews = await getAllNewsFromDB();
+        const userNews = allNews.filter(
+            (x) => x.documentAuthor._key.path.segments[6] === userId
+        );
+        res.status(200).json(userNews);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+};
+
+const getAllNewsFromDB = async () => {
+    try {
+        const allNews = [];
+
+        const db = firestore.getFirestore(firebase);
+        const newsDB = await firestore.collection(db, "news");
+        const data = await firestore.getDocs(newsDB);
+
+        if (!data.empty) {
+            data.forEach((doc) => {
+                const _new = new New(
+                    doc.id,
+                    doc.data().documentAuthor,
+                    doc.data().documentContent,
+                    doc.data().documentDate,
+                    doc.data().documentId,
+                    doc.data().documentTags,
+                    doc.data().documentTitle,
+                );
+                allNews.push(_new);
+            });
+        }
+        return allNews;
+    } catch (error) {
+        return [];
+    }
+};
+
 module.exports = {
     addNew,
     getAllNews,
     getNew,
     updateNew,
     deleteNew,
+    getNewsByAuthor
 };
