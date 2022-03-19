@@ -9,6 +9,7 @@ const commentRoutes = require("./routes/commentRouter");
 const userRoutes = require("./routes/userRouter");
 const eventRoutes = require("./routes/eventRouter");
 const authRoutes = require("./routes/authRouter");
+const groupRoutes = require("./routes/groupRouter");
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use("/api/comments", commentRoutes.routes);
 app.use("/api/users", userRoutes.routes);
 app.use("/api/events", eventRoutes.routes);
 app.use("/api/auth", authRoutes.routes);
+app.use("/api/groups", groupRoutes.routes);
 
 app.get("/", function (req, res, next) {
   res.send("home page msg");
