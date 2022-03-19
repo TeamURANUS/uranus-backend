@@ -1,4 +1,4 @@
-const firebase = require("../firedb");
+const firebase = require("../utils/firedb");
 const firestore = require("firebase/firestore/lite");
 const Notification = require("../models/notification");
 
@@ -20,28 +20,13 @@ const addNotification = async (req, res, next) => {
 
 const getAllNotifications = async (req, res, next) => {
     try {
-        const allNotifications = [];
+        const allNotifications = await getAllNotificationsFromDB();
 
-        const db = firestore.getFirestore(firebase);
-        const notificationsDB = await firestore.collection(db, "notifications");
-        const data = await firestore.getDocs(notificationsDB);
-
-        if (data.empty) {
+        if (allNotifications.empty) {
             res.status(404).json({
                 messsage: "No Notification record found.",
             });
         } else {
-            data.forEach((doc) => {
-                const notification = new Notification(
-                    doc.id,
-                    doc.data().notifContent,
-                    doc.data().notifDate,
-                    doc.data().notifId,
-                    doc.data().notifTargetGroup,
-                    doc.data().notifTitle,
-                );
-                allNotifications.push(notification);
-            });
             res.status(200).json({
                 data: allNotifications,
             });
@@ -111,10 +96,61 @@ const deleteNotification = async (req, res, next) => {
     }
 };
 
+const getNotificationsByTargetGroup = async (req, res, next) => {
+    try {
+        const groupId = req.params.groupId;
+        const allNotifications = await getAllNotificationsFromDB();
+        let groupNotifications = [];
+        for (let i = 0; i < allNotifications.length; i++) {
+            const notification = allNotifications[i];
+            const temp = notification.notifTargetGroup.filter(
+                (x) => x._key.path.segments[6] === groupId
+            );
+            if (temp[0] !== undefined) {
+                groupNotifications.push(notification);
+            }
+        }
+        res.status(200).json(groupNotifications);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        })
+    }
+};
+
+const getAllNotificationsFromDB = async () => {
+    try {
+        const allNotifications = [];
+        const db = firestore.getFirestore(firebase);
+        const notificationsDB = await firestore.collection(db, "notifications");
+        const data = await firestore.getDocs(notificationsDB);
+
+        if (!data.empty) {
+            data.forEach((doc) => {
+                const notification = new Notification(
+                    doc.id,
+                    doc.data().notifContent,
+                    doc.data().notifDate,
+                    doc.data().notifId,
+                    doc.data().notifTargetGroup,
+                    doc.data().notifTitle,
+                );
+                allNotifications.push(notification);
+            });
+        }
+        return allNotifications;
+
+    } catch (error) {
+        return [];
+    }
+
+};
+
 module.exports = {
     addNotification,
     getAllNotifications,
     getNotification,
     updateNotification,
     deleteNotification,
+    getNotificationsByTargetGroup
 };
