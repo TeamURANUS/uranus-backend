@@ -104,9 +104,11 @@ const getEventByOrganizer = async (req, res, next) => {
     for (let i = 0; i < allEvents.length; i++) {
       const event = allEvents[i];
       const temp = event.eventOrganizers.filter(
-          (x) => x._key.path.segments[6] === organizationId
+        (x) => x._key.path.segments[6] === organizationId
       );
-      organizationEvents.push(temp);
+      if (temp[0] !== undefined) {
+        organizationEvents.push(event);
+      }
     }
     res.status(200).json(organizationEvents);
   } catch (error) {
@@ -126,7 +128,9 @@ const getEventByUser = async (req, res, next) => {
       const temp = event.eventParticipants.filter(
         (x) => x._key.path.segments[6] === userId
       );
-      userEvents.push(temp);
+      if (temp[0] !== undefined){
+          userEvents.push(event);
+      }
     }
 
     res.status(200).json(userEvents);
