@@ -15,7 +15,7 @@ router.get("/", getAllNews);
 router.get("/:newId", getNew);
 router.put("/:newId", updateNew);
 router.delete("/:newId", deleteNew);
-router.get("/userNewLog/:userId", getNewsByAuthor);
+router.get("/userNews/:userId", getNewsByAuthor);
 
 module.exports = {
     routes: router,
