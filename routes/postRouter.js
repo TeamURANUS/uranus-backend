@@ -16,8 +16,8 @@ router.get("/", getAllPosts);
 router.get("/:postId", getPost);
 router.put("/:postId", updatePost);
 router.delete("/:postId", deletePost);
-router.get("/userPostLog/:userId", getPostsByAuthor);
-router.get("/commentPostLog/:commentId", getPostsByComment)
+router.get("/userPosts/:userId", getPostsByAuthor);
+router.get("/commentPosts/:commentId", getPostsByComment)
 
 module.exports = {
     routes: router,
