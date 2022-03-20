@@ -12,6 +12,7 @@ const authRoutes = require("./routes/authRouter");
 const postRoutes = require("./routes/postRouter");
 const newsRoutes = require("./routes/newRouter");
 const groupRoutes = require("./routes/groupRouter");
+const notifRoutes = require("./routes/notificationRouter");
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use("/api/auth", authRoutes.routes);
 app.use("/api/posts", postRoutes.routes);
 app.use("/api/news", newsRoutes.routes);
 app.use("/api/groups", groupRoutes.routes);
+app.use("/api/notifs", notifRoutes.routes);
 
 app.get("/", function (req, res, next) {
   res.send("home page msg");
