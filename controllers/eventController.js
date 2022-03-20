@@ -20,32 +20,13 @@ const addEvent = async (req, res, next) => {
 
 const getAllEvents = async (req, res, next) => {
   try {
-    const allEvents = [];
+    const allEvents = await getAllEventsFromDB();
 
-    const db = firestore.getFirestore(firebase);
-    const eventsDB = await firestore.collection(db, "events");
-    const data = await firestore.getDocs(eventsDB);
-
-    if (data.empty) {
+    if (allEvents.empty) {
       res.status(404).json({
         message: "No event record found.",
       });
     } else {
-      data.forEach((doc) => {
-        const event = new Event(
-          doc.id,
-          doc.data().eventCapacity,
-          doc.data().eventDate,
-          doc.data().eventDescription,
-          doc.data().eventDuration,
-          doc.data().eventId,
-          doc.data().eventName,
-          doc.data().eventOrganizers,
-          doc.data().eventParticipants,
-          doc.data().eventPlace
-        );
-        allEvents.push(event);
-      });
       res.status(200).json({
         data: allEvents,
       });
@@ -115,10 +96,88 @@ const deleteEvent = async (req, res, next) => {
   }
 };
 
+const getEventByOrganizer = async (req, res, next) => {
+  try {
+    const organizationId = req.params.organizationId;
+    const allEvents = await getAllEventsFromDB();
+    let organizationEvents = [];
+    for (let i = 0; i < allEvents.length; i++) {
+      const event = allEvents[i];
+      const temp = event.eventOrganizers.filter(
+        (x) => x._key.path.segments[6] === organizationId
+      );
+      if (temp[0] !== undefined) {
+        organizationEvents.push(event);
+      }
+    }
+    res.status(200).json(organizationEvents);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+const getEventByUser = async (req, res, next) => {
+  try {
+    const userId = req.params.userId;
+    const allEvents = await getAllEventsFromDB();
+    let userEvents = [];
+    for (let i = 0; i < allEvents.length; i++) {
+      const event = allEvents[i];
+      const temp = event.eventParticipants.filter(
+        (x) => x._key.path.segments[6] === userId
+      );
+      if (temp[0] !== undefined){
+          userEvents.push(event);
+      }
+    }
+
+    res.status(200).json(userEvents);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+const getAllEventsFromDB = async () => {
+  try {
+    const allEvents = [];
+
+    const db = firestore.getFirestore(firebase);
+    const eventsDB = await firestore.collection(db, "events");
+    const data = await firestore.getDocs(eventsDB);
+
+    if (!data.empty) {
+      data.forEach((doc) => {
+        const event = new Event(
+          doc.id,
+          doc.data().eventCapacity,
+          doc.data().eventDate,
+          doc.data().eventDescription,
+          doc.data().eventDuration,
+          doc.data().eventId,
+          doc.data().eventName,
+          doc.data().eventOrganizers,
+          doc.data().eventParticipants,
+          doc.data().eventPlace
+        );
+        allEvents.push(event);
+      });
+    }
+    return allEvents;
+  } catch (error) {
+    return [];
+  }
+};
+
 module.exports = {
   addEvent,
   getAllEvents,
   getEvent,
   updateEvent,
   deleteEvent,
+  getEventByOrganizer,
+  getEventByUser,
 };

@@ -1,4 +1,4 @@
-const firebase = require("../firedb");
+const firebase = require("../utils/firedb");
 const firestore = require("firebase/firestore/lite");
 const Post = require("../models/post");
 
@@ -20,29 +20,13 @@ const addPost = async (req, res, next) => {
 
 const getAllPosts = async (req, res, next) => {
     try {
-        const allPosts = [];
+        const allPosts = await getAllPostsFromDB();
 
-        const db = firestore.getFirestore(firebase);
-        const postsDB = await firestore.collection(db, "posts");
-        const data = await firestore.getDocs(postsDB);
-
-        if (data.empty) {
+        if (allPosts.empty) {
             res.status(404).json({
                 messsage: "No Post record found.",
             });
         } else {
-            data.forEach((doc) => {
-                const post = new Post(
-                    doc.id,
-                    doc.data().postAuthor,
-                    doc.data().postComments,
-                    doc.data().postContent,
-                    doc.data().postDate,
-                    doc.data().postId,
-                    doc.data().postTitle,
-                );
-                allPosts.push(post);
-            });
             res.status(200).json({
                 data: allPosts,
             });
@@ -112,10 +96,78 @@ const deletePost = async (req, res, next) => {
     }
 };
 
+const getPostsByAuthor = async (req, res, next) => {
+    try {
+        const userId = req.params.userId;
+        const allPosts = await getAllPostsFromDB();
+        const userPosts = allPosts.filter(
+            (x) => x.postAuthor._key.path.segments[6] === userId
+        );
+        res.status(200).json(userPosts);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+};
+
+const getPostsByComment = async (req, res, next) => {
+    try {
+        const commentId = req.params.commentId;
+        const allPosts = await getAllPostsFromDB();
+        let commentPost = {};
+        for (let i= 0; i< allPosts.length; i++){
+            const post = allPosts[i];
+            const temp = post.postComments.filter(
+                (x) => x._key.path.segments[6] === commentId
+            );
+            if (temp[0] !== undefined){
+                commentPost = post;
+                break;
+            }
+        }
+        res.status(200).json(commentPost);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        })
+    }
+};
+
+const getAllPostsFromDB = async () => {
+    try {
+        const allPosts = [];
+
+        const db = firestore.getFirestore(firebase);
+        const postsDB = await firestore.collection(db, "posts");
+        const data = await firestore.getDocs(postsDB);
+
+        if (!data.empty) {
+            data.forEach((doc) => {
+                const post = new Post(
+                    doc.id,
+                    doc.data().postAuthor,
+                    doc.data().postComments,
+                    doc.data().postContent,
+                    doc.data().postDate,
+                    doc.data().postId,
+                    doc.data().postTitle,
+                );
+                allPosts.push(post);
+            });
+        }
+        return allPosts;
+    } catch (error) {
+        return [];
+    }
+};
+
 module.exports = {
     addPost,
     getAllPosts,
     getPost,
     updatePost,
     deletePost,
+    getPostsByAuthor,
+    getPostsByComment
 };
