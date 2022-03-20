@@ -11,6 +11,7 @@ const eventRoutes = require("./routes/eventRouter");
 const authRoutes = require("./routes/authRouter");
 const postRoutes = require("./routes/postRouter");
 const newsRoutes = require("./routes/newRouter");
+const groupRoutes = require("./routes/groupRouter");
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use("/api/events", eventRoutes.routes);
 app.use("/api/auth", authRoutes.routes);
 app.use("/api/posts", postRoutes.routes);
 app.use("/api/news", newsRoutes.routes);
+app.use("/api/groups", groupRoutes.routes);
 
 app.get("/", function (req, res, next) {
   res.send("home page msg");
