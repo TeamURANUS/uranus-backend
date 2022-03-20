@@ -20,27 +20,13 @@ const addComment = async (req, res, next) => {
 
 const getAllComments = async (req, res, next) => {
   try {
-    const allComments = [];
+    const allComments = await getAllCommentsFromDB();
 
-    const db = firestore.getFirestore(firebase);
-    const commentsDB = await firestore.collection(db, "comments");
-    const data = await firestore.getDocs(commentsDB);
-
-    if (data.empty)
+    if (allComments.empty)
       res.status(404).json({
         message: "Data is empty",
       });
     else {
-      data.forEach((doc) => {
-        const comment = new Comment(
-          doc.id,
-          doc.data().commentAuthor,
-          doc.data().commentContent,
-          doc.data().commentDate,
-          doc.data().commentId
-        );
-        allComments.push(comment);
-      });
       res.status(200).json({
         data: allComments,
       });
@@ -109,10 +95,52 @@ const deleteComment = async (req, res, next) => {
   }
 };
 
+const getCommentsByAuthor = async (req, res, next) => {
+  try {
+    const userID = req.params.userId;
+    const allComments = await getAllCommentsFromDB();
+    const userComments = allComments.filter(
+      (x) => x.commentAuthor._key.path.segments[6] === userID
+    );
+    res.status(200).json(userComments);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+const getAllCommentsFromDB = async () => {
+  try {
+    const allComments = [];
+
+    const db = firestore.getFirestore(firebase);
+    const commentsDB = await firestore.collection(db, "comments");
+    const data = await firestore.getDocs(commentsDB);
+
+    if (!data.empty) {
+      data.forEach((doc) => {
+        const comment = new Comment(
+          doc.id,
+          doc.data().commentAuthor,
+          doc.data().commentContent,
+          doc.data().commentDate,
+          doc.data().commentId
+        );
+        allComments.push(comment);
+      });
+    }
+    return allComments;
+  } catch (error) {
+    return [];
+  }
+};
+
 module.exports = {
   addComment,
   getAllComments,
   getComment,
   updateComment,
   deleteComment,
+  getCommentsByAuthor,
 };
