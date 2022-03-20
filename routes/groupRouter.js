@@ -18,10 +18,10 @@ router.get("/", getAllGroups);
 router.get("/:groupId", getGroup);
 router.put("/:groupId", updateGroup);
 router.delete("/:groupId", deleteGroup);
-router.get("/adminUserGroupLog/:userId", getGroupByAdmin);
-router.get("/assistantUserGroupLog/:userId", getGroupByAssistant);
-router.get("/userGroupLog/:userId", getGroupByMember);
-router.get("/postGroupLog/:postId", getGroupByPost)
+router.get("/adminUserGroups/:userId", getGroupByAdmin);
+router.get("/assistantUserGroups/:userId", getGroupByAssistant);
+router.get("/userGroups/:userId", getGroupByMember);
+router.get("/postGroup/:postId", getGroupByPost)
 
 
 module.exports = {
