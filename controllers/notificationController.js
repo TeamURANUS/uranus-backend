@@ -6,8 +6,8 @@ const addNotification = async (req, res, next) => {
     try {
         const data = req.body;
         const db = firestore.getFirestore(firebase);
-        const notificationsDB = firestore.collection(db, "notifications");
-        await firestore.addDoc(notificationsDB, data);
+        const notificationsDB = firestore.doc(db, "notifications", data.notifId);
+        await firestore.setDoc(notificationsDB, data);
         res.status(201).json({
             message: "Notification added successfully!",
         });

@@ -6,8 +6,8 @@ const addPost = async (req, res, next) => {
     try {
         const data = req.body;
         const db = firestore.getFirestore(firebase);
-        const postsDB = firestore.collection(db, "posts");
-        await firestore.addDoc(postsDB, data);
+        const postsDB = firestore.doc(db, "posts", data.postId);
+        await firestore.setDoc(postsDB, data);
         res.status(201).json({
             message: "Post added successfully!",
         });

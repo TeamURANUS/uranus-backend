@@ -6,8 +6,8 @@ const addComment = async (req, res, next) => {
   try {
     const data = req.body;
     const db = firestore.getFirestore(firebase);
-    const commentsDB = firestore.collection(db, "comments");
-    await firestore.addDoc(commentsDB, data);
+    const commentsDB = firestore.doc(db, "comments", data.commentId);
+    await firestore.setDoc(commentsDB, data);
     res.status(201).json({
       message: "comment created",
     });

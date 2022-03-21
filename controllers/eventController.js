@@ -6,8 +6,8 @@ const addEvent = async (req, res, next) => {
   try {
     const data = req.body;
     const db = firestore.getFirestore(firebase);
-    const eventsDB = firestore.collection(db, "events");
-    await firestore.addDoc(eventsDB, data);
+    const eventsDB = firestore.doc(db, "events", data.eventId);
+    await firestore.setDoc(eventsDB, data);
     res.status(201).json({
       message: "Event added successfully!",
     });

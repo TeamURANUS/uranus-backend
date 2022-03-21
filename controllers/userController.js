@@ -6,10 +6,10 @@ const addUser = async (req, res, next) => {
   try {
     const data = req.body;
     const db = firestore.getFirestore(firebase);
-    const usersDB = firestore.collection(db, "users");
-    await firestore.addDoc(usersDB, data);
+    const usersDB = firestore.doc(db, "users", data.userId);
+    await firestore.setDoc(usersDB, data);
     res.status(201).json({
-      message: "User added successfully!",
+      message: "User added successfully.",
     });
   } catch (error) {
     res.status(400).json({
