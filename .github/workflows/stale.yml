@@ -1,0 +1,20 @@
+# This workflow warns PRs that have had no activity for a specified amount of time.
+name: Mark stale issues and pull requests
+
+on:
+  schedule:
+  - cron: '00 19 * * *'
+
+jobs:
+  stale:
+
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+    - uses: actions/stale@v3
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        stale-pr-message: 'Can you review that pull request?'
+        stale-pr-label: 'no-pr-activity'
