@@ -6,8 +6,8 @@ const addNew = async (req, res, next) => {
     try {
         const data = req.body;
         const db = firestore.getFirestore(firebase);
-        const newsDB = firestore.collection(db, "news");
-        await firestore.addDoc(newsDB, data);
+        const newsDB = firestore.doc(db, "news", data.documentId);
+        await firestore.setDoc(newsDB, data);
         res.status(201).json({
             message: "New added successfully!",
         });

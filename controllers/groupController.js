@@ -6,8 +6,8 @@ const addGroup = async (req, res, next) => {
     try {
         const data = req.body;
         const db = firestore.getFirestore(firebase);
-        const groupsDB = firestore.collection(db, "groups");
-        await firestore.addDoc(groupsDB, data);
+        const groupsDB = firestore.doc(db, "groups", data.groupId);
+        await firestore.setDoc(groupsDB, data);
         res.status(201).json({
             message: "Group added successfully!",
         });
