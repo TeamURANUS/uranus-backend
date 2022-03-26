@@ -25,7 +25,7 @@ const authMiddleware = (req, res, next) => {
       next();
     })
     .catch((error) => {
-      logger.debug(`User authenticated with token: ${error.message}`);
+      logger.debug(`User authentication error: ${error.message}`);
       res.status(403).json({ message: "Could not authorize" });
     });
 };
