@@ -6,6 +6,7 @@ const logger = require("../utils/logger");
 const addEvent = async (req, res, next) => {
   try {
     const data = req.body;
+    data.eventDate = firestore.Timestamp.fromDate(new Date(data.eventDate));
     const db = firestore.getFirestore(firebase);
     const eventsDB = firestore.doc(db, "events", data.eventId);
     await firestore.setDoc(eventsDB, data);
@@ -69,6 +70,7 @@ const updateEvent = async (req, res, next) => {
   try {
     const eventId = req.params.eventId;
     const data = req.body;
+    data.eventDate = firestore.Timestamp.fromDate(new Date(data.eventDate));
     const db = firestore.getFirestore(firebase);
     const event = await firestore.doc(db, "events", eventId);
     await firestore.updateDoc(event, data);

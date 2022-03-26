@@ -6,6 +6,7 @@ const logger = require("../utils/logger");
 const addNotification = async (req, res, next) => {
     try {
         const data = req.body;
+        data.notifDate = firestore.Timestamp.fromDate(new Date(data.notifDate));
         const db = firestore.getFirestore(firebase);
         const notificationsDB = firestore.doc(db, "notifications", data.notifId);
         await firestore.setDoc(notificationsDB, data);
@@ -69,6 +70,7 @@ const updateNotification = async (req, res, next) => {
     try {
         const notificationId = req.params.notificationId;
         const data = req.body;
+        data.notifDate = firestore.Timestamp.fromDate(new Date(data.notifDate));
         const db = firestore.getFirestore(firebase);
         const notification = await firestore.doc(db, "notifications", notificationId);
         await firestore.updateDoc(notification, data);

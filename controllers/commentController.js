@@ -6,6 +6,7 @@ const logger = require("../utils/logger");
 const addComment = async (req, res, next) => {
   try {
     const data = req.body;
+    data.commentDate = firestore.Timestamp.fromDate(new Date(data.commentDate));
     const db = firestore.getFirestore(firebase);
     const commentsDB = firestore.doc(db, "comments", data.commentId);
     await firestore.setDoc(commentsDB, data);
@@ -68,6 +69,7 @@ const updateComment = async (req, res, next) => {
   try {
     const commentId = req.params.commentId;
     const data = req.body;
+    data.commentDate = firestore.Timestamp.fromDate(new Date(data.commentDate));
     const db = firestore.getFirestore(firebase);
     const comment = await firestore.doc(db, "comments", commentId);
     await firestore.updateDoc(comment, data);

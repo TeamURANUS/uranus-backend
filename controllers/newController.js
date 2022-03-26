@@ -6,6 +6,7 @@ const logger = require("../utils/logger")
 const addNew = async (req, res, next) => {
     try {
         const data = req.body;
+        data.documentDate = firestore.Timestamp.fromDate(new Date(data.documentDate));
         const db = firestore.getFirestore(firebase);
         const newsDB = firestore.doc(db, "news", data.documentId);
         await firestore.setDoc(newsDB, data);
@@ -69,6 +70,7 @@ const updateNew = async (req, res, next) => {
     try {
         const newId = req.params.newId;
         const data = req.body;
+        data.documentDate = firestore.Timestamp.fromDate(new Date(data.documentDate));
         const db = firestore.getFirestore(firebase);
         const _new = await firestore.doc(db, "news", newId);
         await firestore.updateDoc(_new, data);
