@@ -89,11 +89,20 @@ const deleteEvent = async (req, res, next) => {
     const eventId = req.params.eventId;
     const db = firestore.getFirestore(firebase);
     const event = await firestore.doc(db, "events", eventId);
-    await firestore.deleteDoc(event);
+    const eventCheck = await firestore.getDoc(event);
 
-    res.status(200).json({
-      message: "Event record has been deleted successfully!",
-    });
+    if (eventCheck.exists()) {
+      await firestore.deleteDoc(event);
+      res.status(200).json({
+        message: "Event record has been deleted successfully!",
+      });
+    } else {
+      let errorMessage = "Event cannot found.";
+      logger.error(errorMessage);
+      res.status(500).json({
+        message: errorMessage,
+      });
+    }
   } catch (error) {
     logger.error(error.message);
     res.status(500).json({

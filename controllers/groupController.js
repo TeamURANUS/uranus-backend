@@ -89,11 +89,20 @@ const deleteGroup = async (req, res, next) => {
         const groupId = req.params.groupId;
         const db = firestore.getFirestore(firebase);
         const group = await firestore.doc(db, "groups", groupId);
-        await firestore.deleteDoc(group);
+        const groupCheck = await firestore.getDoc(group);
 
-        res.status(200).json({
-            message: "Group record has been deleted successfully!",
-        });
+        if (groupCheck.exists()) {
+            await firestore.deleteDoc(group);
+            res.status(200).json({
+                message: "Group record has been deleted successfully!",
+            });
+        } else {
+            let errorMessage = "Group cannot found.";
+            logger.error(errorMessage);
+            res.status(500).json({
+                message: errorMessage,
+            });
+        }
     } catch (error) {
         logger.error(error.message);
         res.status(500).json({

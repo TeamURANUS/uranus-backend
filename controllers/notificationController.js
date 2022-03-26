@@ -89,11 +89,20 @@ const deleteNotification = async (req, res, next) => {
         const notificationId = req.params.notificationId;
         const db = firestore.getFirestore(firebase);
         const notification = await firestore.doc(db, "notifications", notificationId);
-        await firestore.deleteDoc(notification);
+        const notifCheck = await firestore.getDoc(notification);
 
-        res.status(200).json({
-            message: "Notification record has been deleted successfully!",
-        });
+        if (notifCheck.exists()) {
+            await firestore.deleteDoc(notification);
+            res.status(200).json({
+                message: "Notification record has been deleted successfully!",
+            });
+        } else {
+            let errorMessage = "Notification cannot found.";
+            logger.error(errorMessage);
+            res.status(500).json({
+                message: errorMessage,
+            });
+        }
     } catch (error) {
         logger.error(error.message);
         res.status(500).json({

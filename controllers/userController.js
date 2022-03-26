@@ -106,12 +106,21 @@ const deleteUser = async (req, res, next) => {
   try {
     const userId = req.params.userId;
     const db = firestore.getFirestore(firebase);
-    const user = await firestore.doc(db, "users", userId);
-    await firestore.deleteDoc(user);
+    const user = firestore.doc(db, "users", userId);
+    const userCheck = await firestore.getDoc(user);
 
-    res.status(200).json({
-      message: "User record has been deleted successfully!",
-    });
+    if (userCheck.exists()) {
+      await firestore.deleteDoc(user);
+      res.status(200).json({
+        message: "User record has been deleted successfully!",
+      });
+    } else {
+      let errorMessage = "User cannot found.";
+      logger.error(errorMessage);
+      res.status(500).json({
+        message: errorMessage,
+      });
+    }
   } catch (error) {
     logger.error(error.message);
     res.status(500).json({
