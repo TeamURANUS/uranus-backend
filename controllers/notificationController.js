@@ -1,6 +1,7 @@
 const firebase = require("../utils/firedb");
 const firestore = require("firebase/firestore/lite");
 const Notification = require("../models/notification");
+const logger = require("../utils/logger");
 
 const addNotification = async (req, res, next) => {
     try {
@@ -12,6 +13,7 @@ const addNotification = async (req, res, next) => {
             message: "Notification added successfully!",
         });
     } catch (error) {
+        logger.error(error.message);
         res.status(400).json({
             message: error.message,
         });
@@ -24,7 +26,7 @@ const getAllNotifications = async (req, res, next) => {
 
         if (allNotifications.empty) {
             res.status(404).json({
-                messsage: "No Notification record found.",
+                message: "No Notification record found.",
             });
         } else {
             res.status(200).json({
@@ -32,6 +34,7 @@ const getAllNotifications = async (req, res, next) => {
             });
         }
     } catch (error) {
+        logger.error(error.message);
         res.status(500).json({
             message: error.message,
         });
@@ -55,6 +58,7 @@ const getNotification = async (req, res, next) => {
             });
         }
     } catch (error) {
+        logger.error(error.message);
         res.status(500).json({
             message: error.message,
         });
@@ -73,6 +77,7 @@ const updateNotification = async (req, res, next) => {
             message: "Notification record has updated successfully!",
         });
     } catch (error) {
+        logger.error(error.message);
         res.status(500).json({
             message: error.message,
         });
@@ -90,6 +95,7 @@ const deleteNotification = async (req, res, next) => {
             message: "Notification record has been deleted successfully!",
         });
     } catch (error) {
+        logger.error(error.message);
         res.status(500).json({
             message: error.message,
         });
@@ -112,6 +118,7 @@ const getNotificationsByTargetGroup = async (req, res, next) => {
         }
         res.status(200).json(groupNotifications);
     } catch (error) {
+        logger.error(error.message);
         res.status(500).json({
             message: error.message
         })
@@ -141,6 +148,7 @@ const getAllNotificationsFromDB = async () => {
         return allNotifications;
 
     } catch (error) {
+        logger.error(error.message);
         return [];
     }
 

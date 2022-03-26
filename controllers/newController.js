@@ -1,6 +1,7 @@
 const firebase = require("../utils/firedb");
 const firestore = require("firebase/firestore/lite");
 const New = require("../models/new");
+const logger = require("../utils/logger")
 
 const addNew = async (req, res, next) => {
     try {
@@ -12,6 +13,7 @@ const addNew = async (req, res, next) => {
             message: "New added successfully!",
         });
     } catch (error) {
+        logger.error(error.message);
         res.status(400).json({
             message: error.message,
         });
@@ -24,7 +26,7 @@ const getAllNews = async (req, res, next) => {
 
         if (allNews.empty) {
             res.status(404).json({
-                messsage: "No New record found.",
+                message: "No New record found.",
             });
         } else {
             res.status(200).json({
@@ -32,6 +34,7 @@ const getAllNews = async (req, res, next) => {
             });
         }
     } catch (error) {
+        logger.error(error.message);
         res.status(500).json({
             message: error.message,
         });
@@ -55,6 +58,7 @@ const getNew = async (req, res, next) => {
             });
         }
     } catch (error) {
+        logger.error(error.message);
         res.status(500).json({
             message: error.message,
         });
@@ -73,6 +77,7 @@ const updateNew = async (req, res, next) => {
             message: "New record has updated successfully!",
         });
     } catch (error) {
+        logger.error(error.message);
         res.status(500).json({
             message: error.message,
         });
@@ -90,6 +95,7 @@ const deleteNew = async (req, res, next) => {
             message: "New record has been deleted successfully!",
         });
     } catch (error) {
+        logger.error(error.message);
         res.status(500).json({
             message: error.message,
         });
@@ -105,6 +111,7 @@ const getNewsByAuthor = async (req, res, next) => {
         );
         res.status(200).json(userNews);
     } catch (error) {
+        logger.error(error.message);
         res.status(500).json({
             message: error.message
         });
@@ -135,6 +142,7 @@ const getAllNewsFromDB = async () => {
         }
         return allNews;
     } catch (error) {
+        logger.error(error.message);
         return [];
     }
 };

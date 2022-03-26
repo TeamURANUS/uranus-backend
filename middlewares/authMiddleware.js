@@ -1,4 +1,5 @@
 const admin = require("../utils/firebaseService");
+const logger = require("../utils/logger");
 
 const authMiddleware = (req, res, next) => {
   const headerToken = req.headers.authorization;
@@ -15,6 +16,7 @@ const authMiddleware = (req, res, next) => {
     .auth()
     .verifyIdToken(token)
     .then((decodedToken) => {
+      logger.debug(`User authenticated with token: ${decodedToken.user_id}`);
       req.loggedUser = {
         email: decodedToken.email,
         isVerified: decodedToken.email_verified,
@@ -22,7 +24,10 @@ const authMiddleware = (req, res, next) => {
       };
       next();
     })
-    .catch(() => res.status(403).json({ message: "Could not authorize" }));
+    .catch((error) => {
+      logger.debug(`User authentication error: ${error.message}`);
+      res.status(403).json({ message: "Could not authorize" });
+    });
 };
 
 module.exports = authMiddleware;

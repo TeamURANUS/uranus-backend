@@ -1,6 +1,7 @@
 const firebase = require("../utils/firedb");
 const firestore = require("firebase/firestore/lite");
 const Comment = require("../models/comment");
+const logger = require("../utils/logger");
 
 const addComment = async (req, res, next) => {
   try {
@@ -12,6 +13,7 @@ const addComment = async (req, res, next) => {
       message: "comment created",
     });
   } catch (error) {
+    logger.error(error.message);
     res.status(400).json({
       message: error.message,
     });
@@ -32,6 +34,7 @@ const getAllComments = async (req, res, next) => {
       });
     }
   } catch (error) {
+    logger.error(error.message);
     res.status(500).json({
       message: error.message,
     });
@@ -54,6 +57,7 @@ const getComment = async (req, res, next) => {
         data: data.data(),
       });
   } catch (error) {
+    logger.error(error.message);
     res.status(500).json({
       message: error.message,
     });
@@ -72,6 +76,7 @@ const updateComment = async (req, res, next) => {
       message: "Comment record has updated successfully!",
     });
   } catch (error) {
+    logger.error(error.message);
     res.status(500).json({
       message: error.message,
     });
@@ -89,6 +94,7 @@ const deleteComment = async (req, res, next) => {
       message: "Comment record has been deleted successfully!",
     });
   } catch (error) {
+    logger.error(error.message);
     res.status(500).json({
       message: error.message,
     });
@@ -104,6 +110,7 @@ const getCommentsByAuthor = async (req, res, next) => {
     );
     res.status(200).json(userComments);
   } catch (error) {
+    logger.error(error.message);
     res.status(500).json({
       message: error.message,
     });
@@ -132,6 +139,7 @@ const getAllCommentsFromDB = async () => {
     }
     return allComments;
   } catch (error) {
+    logger.error(error.message);
     return [];
   }
 };

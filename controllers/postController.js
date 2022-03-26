@@ -1,6 +1,7 @@
 const firebase = require("../utils/firedb");
 const firestore = require("firebase/firestore/lite");
 const Post = require("../models/post");
+const logger = require("../utils/logger");
 
 const addPost = async (req, res, next) => {
     try {
@@ -12,6 +13,7 @@ const addPost = async (req, res, next) => {
             message: "Post added successfully!",
         });
     } catch (error) {
+        logger.error(error.message);
         res.status(400).json({
             message: error.message,
         });
@@ -24,7 +26,7 @@ const getAllPosts = async (req, res, next) => {
 
         if (allPosts.empty) {
             res.status(404).json({
-                messsage: "No Post record found.",
+                message: "No Post record found.",
             });
         } else {
             res.status(200).json({
@@ -32,6 +34,7 @@ const getAllPosts = async (req, res, next) => {
             });
         }
     } catch (error) {
+        logger.error(error.message);
         res.status(500).json({
             message: error.message,
         });
@@ -55,6 +58,7 @@ const getPost = async (req, res, next) => {
             });
         }
     } catch (error) {
+        logger.error(error.message);
         res.status(500).json({
             message: error.message,
         });
@@ -73,6 +77,7 @@ const updatePost = async (req, res, next) => {
             message: "Post record has updated successfully!",
         });
     } catch (error) {
+        logger.error(error.message);
         res.status(500).json({
             message: error.message,
         });
@@ -90,6 +95,7 @@ const deletePost = async (req, res, next) => {
             message: "Post record has been deleted successfully!",
         });
     } catch (error) {
+        logger.error(error.message);
         res.status(500).json({
             message: error.message,
         });
@@ -105,6 +111,7 @@ const getPostsByAuthor = async (req, res, next) => {
         );
         res.status(200).json(userPosts);
     } catch (error) {
+        logger.error(error.message);
         res.status(500).json({
             message: error.message
         });
@@ -128,6 +135,7 @@ const getPostsByComment = async (req, res, next) => {
         }
         res.status(200).json(commentPost);
     } catch (error) {
+        logger.error(error.message);
         res.status(500).json({
             message: error.message
         })
@@ -158,6 +166,7 @@ const getAllPostsFromDB = async () => {
         }
         return allPosts;
     } catch (error) {
+        logger.error(error.message);
         return [];
     }
 };
