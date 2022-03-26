@@ -1,4 +1,5 @@
 const admin = require("../utils/firebaseService");
+const logger = require("../utils/logger");
 const {
   getAuth,
   createUserWithEmailAndPassword,
@@ -18,7 +19,7 @@ const register = async (req, res, next) => {
       const user = userCredential.user;
 
       sendEmailVerification(user).catch((error) => {
-        console.log(error); // TODO
+        logger.error(error);
       });
 
       res.status(201).json({
@@ -28,6 +29,7 @@ const register = async (req, res, next) => {
     })
     .catch((error) => {
       const errorMessage = error.message;
+      logger.error(errorMessage);
       res.status(500).json({
         message: errorMessage,
       });
@@ -46,10 +48,9 @@ const login = async (req, res, next) => {
       });
     })
     .catch((error) => {
-      const errorCode = error.code;
       const errorMessage = error.message;
+      logger.error(errorMessage);
       res.status(500).json({
-        //TODO
         message: errorMessage,
       });
     });
@@ -59,11 +60,11 @@ const resetPassword = async (req, res, next) => {
   const receiverMail = req.body.email;
   sendPasswordResetEmail(auth, receiverMail)
     .then((a) => {
-      console.log(a);
       res.status(200).json({ message: "Reset password mail sent" });
     })
     .catch((error) => {
-      console.log(error.code);
+      const errorMessage = error.message;
+      logger.error(errorMessage);
       res.status(500).json({ message: error.code });
     });
 };

@@ -1,6 +1,7 @@
 const firebase = require("../utils/firedb");
 const firestore = require("firebase/firestore/lite");
 const User = require("../models/user");
+const logger = require("../utils/logger");
 
 const addUser = async (req, res, next) => {
   try {
@@ -12,6 +13,7 @@ const addUser = async (req, res, next) => {
       message: "User added successfully.",
     });
   } catch (error) {
+    logger.error(error.message);
     res.status(400).json({
       message: error.message,
     });
@@ -28,7 +30,7 @@ const getAllUsers = async (req, res, next) => {
 
     if (data.empty) {
       res.status(404).json({
-        messsage: "No user record found.",
+        message: "No user record found.",
       });
     } else {
       data.forEach((doc) => {
@@ -50,6 +52,7 @@ const getAllUsers = async (req, res, next) => {
       });
     }
   } catch (error) {
+    logger.error(error.message);
     res.status(500).json({
       message: error.message,
     });
@@ -73,6 +76,7 @@ const getUser = async (req, res, next) => {
       });
     }
   } catch (error) {
+    logger.error(error.message);
     res.status(500).json({
       message: error.message,
     });
@@ -91,6 +95,7 @@ const updateUser = async (req, res, next) => {
       message: "User record has updated successfully!",
     });
   } catch (error) {
+    logger.error(error.message);
     res.status(500).json({
       message: error.message,
     });
@@ -108,6 +113,7 @@ const deleteUser = async (req, res, next) => {
       message: "User record has been deleted successfully!",
     });
   } catch (error) {
+    logger.error(error.message);
     res.status(500).json({
       message: error.message,
     });

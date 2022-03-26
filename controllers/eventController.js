@@ -1,6 +1,7 @@
 const firebase = require("../utils/firedb");
 const firestore = require("firebase/firestore/lite");
 const Event = require("../models/event");
+const logger = require("../utils/logger");
 
 const addEvent = async (req, res, next) => {
   try {
@@ -12,6 +13,7 @@ const addEvent = async (req, res, next) => {
       message: "Event added successfully!",
     });
   } catch (error) {
+    logger.error(error.message);
     res.status(400).json({
       message: error.message,
     });
@@ -32,6 +34,7 @@ const getAllEvents = async (req, res, next) => {
       });
     }
   } catch (error) {
+    logger.error(error.message);
     res.status(500).json({
       message: error.message,
     });
@@ -55,6 +58,7 @@ const getEvent = async (req, res, next) => {
       });
     }
   } catch (error) {
+    logger.error(error.message);
     res.status(500).json({
       message: error.message,
     });
@@ -73,6 +77,7 @@ const updateEvent = async (req, res, next) => {
       message: "Event record has updated successfully!",
     });
   } catch (error) {
+    logger.error(error.message);
     res.status(500).json({
       message: error.message,
     });
@@ -90,6 +95,7 @@ const deleteEvent = async (req, res, next) => {
       message: "Event record has been deleted successfully!",
     });
   } catch (error) {
+    logger.error(error.message);
     res.status(500).json({
       message: error.message,
     });
@@ -112,6 +118,7 @@ const getEventByOrganizer = async (req, res, next) => {
     }
     res.status(200).json(organizationEvents);
   } catch (error) {
+    logger.error(error.message);
     res.status(500).json({
       message: error.message,
     });
@@ -128,13 +135,14 @@ const getEventByUser = async (req, res, next) => {
       const temp = event.eventParticipants.filter(
         (x) => x._key.path.segments[6] === userId
       );
-      if (temp[0] !== undefined){
-          userEvents.push(event);
+      if (temp[0] !== undefined) {
+        userEvents.push(event);
       }
     }
 
     res.status(200).json(userEvents);
   } catch (error) {
+    logger.error(error.message);
     res.status(500).json({
       message: error.message,
     });
@@ -168,16 +176,17 @@ const getAllEventsFromDB = async () => {
     }
     return allEvents;
   } catch (error) {
+    logger.error(error.message);
     return [];
   }
 };
 
 module.exports = {
-  addEvent,
-  getAllEvents,
-  getEvent,
-  updateEvent,
-  deleteEvent,
-  getEventByOrganizer,
-  getEventByUser,
+    addEvent,
+    getAllEvents,
+    getEvent,
+    updateEvent,
+    deleteEvent,
+    getEventByOrganizer,
+    getEventByUser,
 };

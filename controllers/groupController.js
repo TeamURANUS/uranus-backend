@@ -1,6 +1,7 @@
 const firebase = require("../utils/firedb");
 const firestore = require("firebase/firestore/lite");
 const Group = require("../models/group");
+const logger =require("../utils/logger")
 
 const addGroup = async (req, res, next) => {
     try {
@@ -12,6 +13,7 @@ const addGroup = async (req, res, next) => {
             message: "Group added successfully!",
         });
     } catch (error) {
+        logger.error(error.message);
         res.status(400).json({
             message: error.message,
         });
@@ -24,7 +26,7 @@ const getAllGroups = async (req, res, next) => {
 
         if (allGroups.empty) {
             res.status(404).json({
-                messsage: "No Group record found.",
+                message: "No Group record found.",
             });
         } else {
             res.status(200).json({
@@ -32,6 +34,7 @@ const getAllGroups = async (req, res, next) => {
             });
         }
     } catch (error) {
+        logger.error(error.message);
         res.status(500).json({
             message: error.message,
         });
@@ -55,6 +58,7 @@ const getGroup = async (req, res, next) => {
             });
         }
     } catch (error) {
+        logger.error(error.message);
         res.status(500).json({
             message: error.message,
         });
@@ -73,6 +77,7 @@ const updateGroup = async (req, res, next) => {
             message: "Group record has updated successfully!",
         });
     } catch (error) {
+        logger.error(error.message);
         res.status(500).json({
             message: error.message,
         });
@@ -90,6 +95,7 @@ const deleteGroup = async (req, res, next) => {
             message: "Group record has been deleted successfully!",
         });
     } catch (error) {
+        logger.error(error.message);
         res.status(500).json({
             message: error.message,
         });
@@ -105,6 +111,7 @@ const getGroupByAdmin = async (req, res, next) => {
         );
         res.status(200).json(adminUserGroups);
     } catch (error) {
+        logger.error(error.message);
         res.status(500).json({
             message: error.message
         })
@@ -126,6 +133,7 @@ const getGroupByAssistant = async (req, res, next) => {
         }
         res.status(200).json(userGroups);
     } catch (error) {
+        logger.error(error.message);
         res.status(500).json({
             message: error.message
         })
@@ -147,6 +155,7 @@ const getGroupByMember = async (req, res, next) => {
         }
         res.status(200).json(userGroups);
     } catch (error) {
+        logger.error(error.message);
         res.status(500).json({
             message: error.message
         })
@@ -170,6 +179,7 @@ const getGroupByPost = async (req, res, next) => {
         }
         res.status(200).json(postGroup);
     } catch (error) {
+        logger.error(error.message);
         res.status(500).json({
             message: error.message
         })
@@ -203,6 +213,7 @@ const getAllGroupsFromDB = async () => {
         }
         return allGroups;
     } catch (error) {
+        logger.error(error.message);
         return [];
     }
 }

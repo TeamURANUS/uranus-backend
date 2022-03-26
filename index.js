@@ -6,6 +6,8 @@ const morgan = require("morgan");
 const createError = require("http-errors");
 
 const config = require("./utils/config");
+const logger = require("./utils/logger");
+
 const commentRoutes = require("./routes/commentRouter");
 const userRoutes = require("./routes/userRouter");
 const eventRoutes = require("./routes/eventRouter");
@@ -16,8 +18,6 @@ const newsRoutes = require("./routes/newRouter");
 const groupRoutes = require("./routes/groupRouter");
 
 const app = express();
-
-const logger = require("./utils/logger");
 
 morgan.token("date", (req, res, tz) => {
   return moment().tz(tz).format("YYYY-MM-DD ZZ HH:mm:ss");
