@@ -6,6 +6,7 @@ const logger = require("../utils/logger");
 const addPost = async (req, res, next) => {
     try {
         const data = req.body;
+        data.postDate = firestore.Timestamp.fromDate(new Date(data.postDate));
         const db = firestore.getFirestore(firebase);
         const postsDB = firestore.doc(db, "posts", data.postId);
         await firestore.setDoc(postsDB, data);
@@ -69,6 +70,7 @@ const updatePost = async (req, res, next) => {
     try {
         const postId = req.params.postId;
         const data = req.body;
+        data.postDate = firestore.Timestamp.fromDate(new Date(data.postDate));
         const db = firestore.getFirestore(firebase);
         const post = await firestore.doc(db, "posts", postId);
         await firestore.updateDoc(post, data);
@@ -89,11 +91,20 @@ const deletePost = async (req, res, next) => {
         const postId = req.params.postId;
         const db = firestore.getFirestore(firebase);
         const post = await firestore.doc(db, "posts", postId);
-        await firestore.deleteDoc(post);
+        const postCheck = await firestore.getDoc(post);
 
-        res.status(200).json({
-            message: "Post record has been deleted successfully!",
-        });
+        if (postCheck.exists()) {
+            await firestore.deleteDoc(post);
+            res.status(200).json({
+                message: "Post record has been deleted successfully!",
+            });
+        } else {
+            let errorMessage = "Post cannot found.";
+            logger.error(errorMessage);
+            res.status(500).json({
+                message: errorMessage,
+            });
+        }
     } catch (error) {
         logger.error(error.message);
         res.status(500).json({

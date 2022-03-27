@@ -6,6 +6,7 @@ const logger = require("../utils/logger");
 const addNotification = async (req, res, next) => {
     try {
         const data = req.body;
+        data.notifDate = firestore.Timestamp.fromDate(new Date(data.notifDate));
         const db = firestore.getFirestore(firebase);
         const notificationsDB = firestore.doc(db, "notifications", data.notifId);
         await firestore.setDoc(notificationsDB, data);
@@ -69,6 +70,7 @@ const updateNotification = async (req, res, next) => {
     try {
         const notificationId = req.params.notificationId;
         const data = req.body;
+        data.notifDate = firestore.Timestamp.fromDate(new Date(data.notifDate));
         const db = firestore.getFirestore(firebase);
         const notification = await firestore.doc(db, "notifications", notificationId);
         await firestore.updateDoc(notification, data);
@@ -89,11 +91,20 @@ const deleteNotification = async (req, res, next) => {
         const notificationId = req.params.notificationId;
         const db = firestore.getFirestore(firebase);
         const notification = await firestore.doc(db, "notifications", notificationId);
-        await firestore.deleteDoc(notification);
+        const notifCheck = await firestore.getDoc(notification);
 
-        res.status(200).json({
-            message: "Notification record has been deleted successfully!",
-        });
+        if (notifCheck.exists()) {
+            await firestore.deleteDoc(notification);
+            res.status(200).json({
+                message: "Notification record has been deleted successfully!",
+            });
+        } else {
+            let errorMessage = "Notification cannot found.";
+            logger.error(errorMessage);
+            res.status(500).json({
+                message: errorMessage,
+            });
+        }
     } catch (error) {
         logger.error(error.message);
         res.status(500).json({

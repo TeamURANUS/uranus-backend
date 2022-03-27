@@ -6,6 +6,7 @@ const logger = require("../utils/logger");
 const addEvent = async (req, res, next) => {
   try {
     const data = req.body;
+    data.eventDate = firestore.Timestamp.fromDate(new Date(data.eventDate));
     const db = firestore.getFirestore(firebase);
     const eventsDB = firestore.doc(db, "events", data.eventId);
     await firestore.setDoc(eventsDB, data);
@@ -69,6 +70,7 @@ const updateEvent = async (req, res, next) => {
   try {
     const eventId = req.params.eventId;
     const data = req.body;
+    data.eventDate = firestore.Timestamp.fromDate(new Date(data.eventDate));
     const db = firestore.getFirestore(firebase);
     const event = await firestore.doc(db, "events", eventId);
     await firestore.updateDoc(event, data);
@@ -89,11 +91,20 @@ const deleteEvent = async (req, res, next) => {
     const eventId = req.params.eventId;
     const db = firestore.getFirestore(firebase);
     const event = await firestore.doc(db, "events", eventId);
-    await firestore.deleteDoc(event);
+    const eventCheck = await firestore.getDoc(event);
 
-    res.status(200).json({
-      message: "Event record has been deleted successfully!",
-    });
+    if (eventCheck.exists()) {
+      await firestore.deleteDoc(event);
+      res.status(200).json({
+        message: "Event record has been deleted successfully!",
+      });
+    } else {
+      let errorMessage = "Event cannot found.";
+      logger.error(errorMessage);
+      res.status(500).json({
+        message: errorMessage,
+      });
+    }
   } catch (error) {
     logger.error(error.message);
     res.status(500).json({

@@ -6,6 +6,7 @@ const logger = require("../utils/logger");
 const addComment = async (req, res, next) => {
   try {
     const data = req.body;
+    data.commentDate = firestore.Timestamp.fromDate(new Date(data.commentDate));
     const db = firestore.getFirestore(firebase);
     const commentsDB = firestore.doc(db, "comments", data.commentId);
     await firestore.setDoc(commentsDB, data);
@@ -68,6 +69,7 @@ const updateComment = async (req, res, next) => {
   try {
     const commentId = req.params.commentId;
     const data = req.body;
+    data.commentDate = firestore.Timestamp.fromDate(new Date(data.commentDate));
     const db = firestore.getFirestore(firebase);
     const comment = await firestore.doc(db, "comments", commentId);
     await firestore.updateDoc(comment, data);
@@ -88,11 +90,20 @@ const deleteComment = async (req, res, next) => {
     const commentId = req.params.commentId;
     const db = firestore.getFirestore(firebase);
     const comment = await firestore.doc(db, "comments", commentId);
-    await firestore.deleteDoc(comment);
+    const commentCheck = await firestore.getDoc(comment);
 
-    res.status(200).json({
-      message: "Comment record has been deleted successfully!",
-    });
+    if (commentCheck.exists()) {
+      await firestore.deleteDoc(comment);
+      res.status(200).json({
+        message: "Comment record has been deleted successfully!",
+      });
+    } else {
+      let errorMessage = "Comment cannot found.";
+      logger.error(errorMessage);
+      res.status(500).json({
+        message: errorMessage,
+      });
+    }
   } catch (error) {
     logger.error(error.message);
     res.status(500).json({
