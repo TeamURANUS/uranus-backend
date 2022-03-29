@@ -69,8 +69,37 @@ const resetPassword = async (req, res, next) => {
     });
 };
 
+const resendVerificationEmail = async (req, res, next) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  await signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      const user = userCredential.user;
+      sendEmailVerification(user)
+        .then((r) => {
+          res.status(200).json({
+            message: "Email resend",
+          });
+        })
+        .catch((error) => {
+          logger.error(error.message);
+          res.status(500).json({
+            message: error.message,
+          });
+        });
+    })
+    .catch((error) => {
+      const errorMessage = error.message;
+      logger.error(errorMessage);
+      res.status(500).json({
+        message: errorMessage,
+      });
+    });
+};
+
 module.exports = {
-  register,
-  login,
-  resetPassword,
+    register,
+    login,
+    resetPassword,
+    resendVerificationEmail
 };
