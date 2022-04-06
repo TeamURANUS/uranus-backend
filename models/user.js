@@ -1,5 +1,5 @@
 class User {
-    constructor(id, userColleague, userId, userLastname, userName, userOtherMail, userPassword, userPhoneNumber, userSchoolMail) {
+    constructor(id, userColleague, userId, userLastname, userName, userOtherMail, userPassword, userPhoneNumber, userSchoolMail, userImage) {
         this.id = id;
         this.userColleague = userColleague;
         this.userId = userId;
@@ -9,6 +9,7 @@ class User {
         this.userPassword = userPassword;
         this.userPhoneNumber = userPhoneNumber;
         this.userSchoolMail = userSchoolMail;
+        this.userImage = userImage;
     }
 }
 
