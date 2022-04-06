@@ -140,7 +140,8 @@ const getAllUsersFromDB = async () => {
                     doc.data().userOtherMail,
                     doc.data().userPassword,
                     doc.data().userPhoneNumber,
-                    doc.data().userSchoolMail
+                    doc.data().userSchoolMail,
+                    doc.data().userImage
                 );
                 allUsers.push(user);
             });
