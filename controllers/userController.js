@@ -104,6 +104,23 @@ const deleteUser = async (req, res, next) => {
     }
 };
 
+const getUserByEmail = async (req, res, next) => {
+    try {
+        const userEmail = req.body.email;
+        const allUsers = await getAllUsersFromDB();
+        const user = allUsers.filter(
+            (x) => x.userSchoolMail === userEmail || x.userOtherMail === userEmail
+        )
+        res.status(200).json(user);
+    } catch (error) {
+        logger.error(error.message);
+        res.status(500).json({
+            message: error.message,
+        });
+    }
+
+}
+
 const getAllUsersFromDB = async () => {
     try {
         const allUsers = [];
@@ -141,4 +158,5 @@ module.exports = {
     getUser,
     updateUser,
     deleteUser,
+    getUserByEmail
 };
