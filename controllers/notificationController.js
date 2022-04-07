@@ -8,6 +8,15 @@ const addNotification = async (req, res, next) => {
         const data = req.body;
         data.notifDate = firestore.Timestamp.fromDate(new Date(data.notifDate));
         const db = firestore.getFirestore(firebase);
+
+        const notifs = data.notifTargetGroup;
+        const tempNotifs = [];
+        for (let i = 0; i < notifs.length; i++) {
+            const temp = firestore.doc(db, 'groups/'+ notifs[i]);
+            tempNotifs.push(temp);
+        }
+        data.notifTargetGroup = tempNotifs;
+
         const notificationsDB = firestore.doc(db, "notifications", data.notifId);
         await firestore.setDoc(notificationsDB, data);
         res.status(201).json({
@@ -72,6 +81,15 @@ const updateNotification = async (req, res, next) => {
         const data = req.body;
         data.notifDate = firestore.Timestamp.fromDate(new Date(data.notifDate));
         const db = firestore.getFirestore(firebase);
+
+        const notifs = data.notifTargetGroup;
+        const tempNotifs = [];
+        for (let i = 0; i < notifs.length; i++) {
+            const temp = firestore.doc(db, 'groups/'+ notifs[i]);
+            tempNotifs.push(temp);
+        }
+        data.notifTargetGroup = tempNotifs;
+
         const notification = await firestore.doc(db, "notifications", notificationId);
         await firestore.updateDoc(notification, data);
 
