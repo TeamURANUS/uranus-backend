@@ -2,6 +2,7 @@ const firebase = require("../utils/firedb");
 const firestore = require("firebase/firestore/lite");
 const Notification = require("../models/notification");
 const logger = require("../utils/logger");
+const idGenerator = require("../utils/idGenerator");
 
 const addNotification = async (req, res, next) => {
     try {
@@ -16,6 +17,7 @@ const addNotification = async (req, res, next) => {
             tempNotifs.push(temp);
         }
         data.notifTargetGroup = tempNotifs;
+        data.notifId = idGenerator();
 
         const notificationsDB = firestore.doc(db, "notifications", data.notifId);
         await firestore.setDoc(notificationsDB, data);
