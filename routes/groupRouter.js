@@ -1,14 +1,15 @@
 const express = require("express");
 const {
-    addGroup,
-    getAllGroups,
-    getGroup,
-    updateGroup,
-    deleteGroup,
-    getGroupByAdmin,
-    getGroupByAssistant,
-    getGroupByMember,
-    getGroupByPost
+  addGroup,
+  getAllGroups,
+  getGroup,
+  updateGroup,
+  deleteGroup,
+  getGroupByAdmin,
+  getGroupByAssistant,
+  getGroupByMember,
+  getGroupByPost,
+  getAllGroupsByUser,
 } = require("../controllers/groupController");
 
 const router = express.Router();
@@ -21,9 +22,9 @@ router.delete("/:groupId", deleteGroup);
 router.get("/adminUserGroups/:userId", getGroupByAdmin);
 router.get("/assistantUserGroups/:userId", getGroupByAssistant);
 router.get("/userGroups/:userId", getGroupByMember);
-router.get("/postGroup/:postId", getGroupByPost)
-
+router.get("/postGroup/:postId", getGroupByPost);
+router.get("/allGroupsOfUser/:userId", getAllGroupsByUser);
 
 module.exports = {
-    routes: router,
+  routes: router,
 };

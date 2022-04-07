@@ -6,7 +6,7 @@ const {
     updatePost,
     deletePost,
     getPostsByAuthor,
-    getPostsByComment
+    getPostsByComment, getPostsByGroupId
 } = require("../controllers/postController");
 
 const router = express.Router();
@@ -18,6 +18,7 @@ router.put("/:postId", updatePost);
 router.delete("/:postId", deletePost);
 router.get("/userPosts/:userId", getPostsByAuthor);
 router.get("/commentPosts/:commentId", getPostsByComment)
+router.get("/groupPosts/:groupId", getPostsByGroupId)
 
 module.exports = {
     routes: router,

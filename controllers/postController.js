@@ -179,6 +179,28 @@ const getPostsByComment = async (req, res, next) => {
     }
 };
 
+const getPostsByGroupId = async (req, res, next) => {
+    try {
+        const groupId = req.params.groupId;
+        const allPosts = await getAllPostsFromDB();
+        let posts = [];
+        for (let i= 0; i< allPosts.length; i++){
+            const post = allPosts[i];
+            console.log(post);
+            const temp = post.hasOwnProperty("postGroupId") && post.postGroupId._key.path.segments[6].trim() === groupId;
+            if (temp){
+                posts.push(post)
+            }
+        }
+        res.status(200).json(posts);
+    } catch (error) {
+        logger.error(error.message);
+        res.status(500).json({
+            message: error.message
+        })
+    }
+};
+
 const getAllPostsFromDB = async () => {
     try {
         const allPosts = [];
@@ -197,6 +219,7 @@ const getAllPostsFromDB = async () => {
                     doc.data().postDate,
                     doc.data().postId,
                     doc.data().postTitle,
+                    doc.data().postGroupId
                 );
                 allPosts.push(post);
             });
@@ -215,5 +238,6 @@ module.exports = {
     updatePost,
     deletePost,
     getPostsByAuthor,
-    getPostsByComment
+    getPostsByComment,
+    getPostsByGroupId
 };
