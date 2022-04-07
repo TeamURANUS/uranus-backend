@@ -19,6 +19,8 @@ const addPost = async (req, res, next) => {
         }
         data.postComments = tempComments;
 
+        data.postGroupId = firestore.doc(db, 'groups/'+ data.postGroupId)
+
         const postsDB = firestore.doc(db, "posts", data.postId);
         await firestore.setDoc(postsDB, data);
         res.status(201).json({
@@ -93,6 +95,8 @@ const updatePost = async (req, res, next) => {
             tempComments.push(temp);
         }
         data.postComments = tempComments;
+
+        data.postGroupId = firestore.doc(db, 'groups/'+ data.postGroupId)
 
         const post = await firestore.doc(db, "posts", postId);
         await firestore.updateDoc(post, data);
