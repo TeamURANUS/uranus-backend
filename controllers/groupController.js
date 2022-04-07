@@ -221,6 +221,36 @@ const getGroupByMember = async (req, res, next) => {
     }
 }
 
+const getAllGroupsByUser = async (req, res, next) => {
+    try {
+        const userId = req.params.userId;
+        const allGroups = await getAllGroupsFromDB();
+        let userGroups = [];
+        for (let i = 0; i < allGroups.length; i++) {
+            const group = allGroups[i];
+            const temp = group.groupMembers.filter(
+                (x) => x._key.path.segments[6] === userId
+            );
+            const temp2 = group.groupAssistants.filter(
+                (x) => x._key.path.segments[6] === userId
+            )
+            const temp3 = group.groupAdmin._key.path.segments[6].trim() === userId;
+            if (temp[0] !== undefined) userGroups.push(["member", group]);
+            if (temp2[0] !== undefined) userGroups.push(["assistant", group]);
+            if (temp3 !== false) {
+                userGroups.push(["admin", group]);
+            }
+        }
+        res.status(200).json(userGroups);
+    } catch (error) {
+        logger.error(error.message);
+        res.status(500).json({
+            message: error.message
+        })
+    }
+}
+
+
 const getGroupByPost = async (req, res, next) => {
     try {
         const postId = req.params.postId;
@@ -285,5 +315,6 @@ module.exports = {
     getGroupByAdmin,
     getGroupByAssistant,
     getGroupByMember,
-    getGroupByPost
+    getGroupByPost,
+    getAllGroupsByUser
 };
