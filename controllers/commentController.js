@@ -8,6 +8,7 @@ const addComment = async (req, res, next) => {
     const data = req.body;
     data.commentDate = firestore.Timestamp.fromDate(new Date(data.commentDate));
     const db = firestore.getFirestore(firebase);
+    data.commentAuthor = firestore.doc(db, 'users/' + data.commentAuthor);
     const commentsDB = firestore.doc(db, "comments", data.commentId);
     await firestore.setDoc(commentsDB, data);
     res.status(201).json({
@@ -71,6 +72,7 @@ const updateComment = async (req, res, next) => {
     const data = req.body;
     data.commentDate = firestore.Timestamp.fromDate(new Date(data.commentDate));
     const db = firestore.getFirestore(firebase);
+    data.commentAuthor = firestore.doc(db, 'users/' + data.commentAuthor);
     const comment = await firestore.doc(db, "comments", commentId);
     await firestore.updateDoc(comment, data);
 

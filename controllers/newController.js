@@ -8,6 +8,9 @@ const addNew = async (req, res, next) => {
         const data = req.body;
         data.documentDate = firestore.Timestamp.fromDate(new Date(data.documentDate));
         const db = firestore.getFirestore(firebase);
+
+        data.documentAuthor = firestore.doc(db, 'users/' + data.documentAuthor);
+
         const newsDB = firestore.doc(db, "news", data.documentId);
         await firestore.setDoc(newsDB, data);
         res.status(201).json({
@@ -72,6 +75,9 @@ const updateNew = async (req, res, next) => {
         const data = req.body;
         data.documentDate = firestore.Timestamp.fromDate(new Date(data.documentDate));
         const db = firestore.getFirestore(firebase);
+
+        data.documentAuthor = firestore.doc(db, 'users/' + data.documentAuthor);
+
         const _new = await firestore.doc(db, "news", newId);
         await firestore.updateDoc(_new, data);
 

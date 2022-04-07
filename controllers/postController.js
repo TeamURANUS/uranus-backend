@@ -8,6 +8,19 @@ const addPost = async (req, res, next) => {
         const data = req.body;
         data.postDate = firestore.Timestamp.fromDate(new Date(data.postDate));
         const db = firestore.getFirestore(firebase);
+
+        data.postAuthor = firestore.doc(db, 'users/' + data.postAuthor);
+
+        const comments = data.postComments;
+        const tempComments = [];
+        for (let i = 0; i < comments.length; i++) {
+            const temp = firestore.doc(db, 'comments/'+comments[i]);
+            tempComments.push(temp);
+        }
+        data.postComments = tempComments;
+
+        data.postGroupId = firestore.doc(db, 'groups/'+ data.postGroupId)
+
         const postsDB = firestore.doc(db, "posts", data.postId);
         await firestore.setDoc(postsDB, data);
         res.status(201).json({
@@ -72,6 +85,19 @@ const updatePost = async (req, res, next) => {
         const data = req.body;
         data.postDate = firestore.Timestamp.fromDate(new Date(data.postDate));
         const db = firestore.getFirestore(firebase);
+
+        data.postAuthor = firestore.doc(db, 'users/' + data.postAuthor);
+
+        const comments = data.postComments;
+        const tempComments = [];
+        for (let i = 0; i < comments.length; i++) {
+            const temp = firestore.doc(db, 'comments/'+comments[i]);
+            tempComments.push(temp);
+        }
+        data.postComments = tempComments;
+
+        data.postGroupId = firestore.doc(db, 'groups/'+ data.postGroupId)
+
         const post = await firestore.doc(db, "posts", postId);
         await firestore.updateDoc(post, data);
 
@@ -134,12 +160,12 @@ const getPostsByComment = async (req, res, next) => {
         const commentId = req.params.commentId;
         const allPosts = await getAllPostsFromDB();
         let commentPost = {};
-        for (let i= 0; i< allPosts.length; i++){
+        for (let i = 0; i < allPosts.length; i++) {
             const post = allPosts[i];
             const temp = post.postComments.filter(
                 (x) => x._key.path.segments[6] === commentId
             );
-            if (temp[0] !== undefined){
+            if (temp[0] !== undefined) {
                 commentPost = post;
                 break;
             }

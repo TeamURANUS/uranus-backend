@@ -8,6 +8,13 @@ const addEvent = async (req, res, next) => {
     const data = req.body;
     data.eventDate = firestore.Timestamp.fromDate(new Date(data.eventDate));
     const db = firestore.getFirestore(firebase);
+    data.eventOrganizers = firestore.doc(db, 'groups/'+data.eventOrganizers)
+    const participants = data.eventParticipants;
+    const temp = [];
+    for (let i = 0; i < participants.length; i++) {
+      temp.push(firestore.doc(db, 'users/'+participants[i]))
+    }
+    data.eventParticipants = temp;
     const eventsDB = firestore.doc(db, "events", data.eventId);
     await firestore.setDoc(eventsDB, data);
     res.status(201).json({
@@ -72,6 +79,13 @@ const updateEvent = async (req, res, next) => {
     const data = req.body;
     data.eventDate = firestore.Timestamp.fromDate(new Date(data.eventDate));
     const db = firestore.getFirestore(firebase);
+    data.eventOrganizers = firestore.doc(db, 'groups/'+data.eventOrganizers)
+    const participants = data.eventParticipants;
+    const temp = [];
+    for (let i = 0; i < participants.length; i++) {
+      temp.push(firestore.doc(db, 'users/'+participants[i]))
+    }
+    data.eventParticipants = temp;
     const event = await firestore.doc(db, "events", eventId);
     await firestore.updateDoc(event, data);
 
