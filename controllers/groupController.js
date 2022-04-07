@@ -7,6 +7,31 @@ const addGroup = async (req, res, next) => {
     try {
         const data = req.body;
         const db = firestore.getFirestore(firebase);
+
+        data.groupAdmin = firestore.doc(db, 'users/' + data.groupAdmin)
+
+        const assistants = data.groupAssistants;
+        const tempAssistants = [];
+        for (let i = 0; i < assistants.length; i++) {
+            const temp = firestore.doc(db, 'users/' + assistants[i]);
+            tempAssistants.push(temp);
+        }
+        data.groupAssistants = tempAssistants;
+
+        const members = data.groupMembers;
+        const tempMembers = [];
+        for (let i = 0; i < members.length; i++) {
+            tempMembers.push(firestore.doc(db, 'users/' + members[i]));
+        }
+        data.groupMembers = tempMembers;
+
+        const posts = data.groupPosts;
+        const tempPosts = [];
+        for (let i = 0; i < posts.length; i++) {
+            tempPosts.push(firestore.doc(db, 'posts/' + posts[i]));
+        }
+        data.groupPosts = tempPosts;
+
         const groupsDB = firestore.doc(db, "groups", data.groupId);
         await firestore.setDoc(groupsDB, data);
         res.status(201).json({
@@ -70,6 +95,31 @@ const updateGroup = async (req, res, next) => {
         const groupId = req.params.groupId;
         const data = req.body;
         const db = firestore.getFirestore(firebase);
+
+        data.groupAdmin = firestore.doc(db, 'users/' + data.groupAdmin)
+
+        const assistants = data.groupAssistants;
+        const tempAssistants = [];
+        for (let i = 0; i < assistants.length; i++) {
+            const temp = firestore.doc(db, 'users/' + assistants[i]);
+            tempAssistants.push(temp);
+        }
+        data.groupAssistants = tempAssistants;
+
+        const members = data.groupMembers;
+        const tempMembers = [];
+        for (let i = 0; i < members.length; i++) {
+            tempMembers.push(firestore.doc(db, 'users/' + members[i]));
+        }
+        data.groupMembers = tempMembers;
+
+        const posts = data.groupPosts;
+        const tempPosts = [];
+        for (let i = 0; i < posts.length; i++) {
+            tempPosts.push(firestore.doc(db, 'posts/' + posts[i]));
+        }
+        data.groupPosts = tempPosts;
+
         const group = await firestore.doc(db, "groups", groupId);
         await firestore.updateDoc(group, data);
 
