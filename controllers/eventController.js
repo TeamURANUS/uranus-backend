@@ -2,6 +2,7 @@ const firebase = require("../utils/firedb");
 const firestore = require("firebase/firestore/lite");
 const Event = require("../models/event");
 const logger = require("../utils/logger");
+const idGenerator = require("../utils/idGenerator");
 
 const addEvent = async (req, res, next) => {
   try {
@@ -15,6 +16,8 @@ const addEvent = async (req, res, next) => {
       temp.push(firestore.doc(db, 'users/'+participants[i]))
     }
     data.eventParticipants = temp;
+    data.eventId = idGenerator();
+
     const eventsDB = firestore.doc(db, "events", data.eventId);
     await firestore.setDoc(eventsDB, data);
     res.status(201).json({

@@ -2,6 +2,7 @@ const firebase = require("../utils/firedb");
 const firestore = require("firebase/firestore/lite");
 const Comment = require("../models/comment");
 const logger = require("../utils/logger");
+const idGenerator = require("../utils/idGenerator");
 
 const addComment = async (req, res, next) => {
   try {
@@ -9,6 +10,7 @@ const addComment = async (req, res, next) => {
     data.commentDate = firestore.Timestamp.fromDate(new Date(data.commentDate));
     const db = firestore.getFirestore(firebase);
     data.commentAuthor = firestore.doc(db, 'users/' + data.commentAuthor);
+    data.commentId = idGenerator();
     const commentsDB = firestore.doc(db, "comments", data.commentId);
     await firestore.setDoc(commentsDB, data);
     res.status(201).json({

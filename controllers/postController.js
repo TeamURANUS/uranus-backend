@@ -2,6 +2,7 @@ const firebase = require("../utils/firedb");
 const firestore = require("firebase/firestore/lite");
 const Post = require("../models/post");
 const logger = require("../utils/logger");
+const idGenerator = require("../utils/idGenerator");
 
 const addPost = async (req, res, next) => {
     try {
@@ -19,7 +20,8 @@ const addPost = async (req, res, next) => {
         }
         data.postComments = tempComments;
 
-        data.postGroupId = firestore.doc(db, 'groups/'+ data.postGroupId)
+        data.postGroupId = firestore.doc(db, 'groups/'+ data.postGroupId);
+        data.postId = idGenerator();
 
         const postsDB = firestore.doc(db, "posts", data.postId);
         await firestore.setDoc(postsDB, data);

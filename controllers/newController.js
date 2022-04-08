@@ -1,7 +1,8 @@
 const firebase = require("../utils/firedb");
 const firestore = require("firebase/firestore/lite");
 const New = require("../models/new");
-const logger = require("../utils/logger")
+const logger = require("../utils/logger");
+const idGenerator = require("../utils/idGenerator");
 
 const addNew = async (req, res, next) => {
     try {
@@ -10,6 +11,7 @@ const addNew = async (req, res, next) => {
         const db = firestore.getFirestore(firebase);
 
         data.documentAuthor = firestore.doc(db, 'users/' + data.documentAuthor);
+        data.documentId = idGenerator();
 
         const newsDB = firestore.doc(db, "news", data.documentId);
         await firestore.setDoc(newsDB, data);

@@ -21,6 +21,7 @@
     "morgan": "~1.9.1",
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
+    "uuid": "^8.3.2",
     "winston": "^3.6.0",
     "winston-mongodb": "^5.0.7"
   },
