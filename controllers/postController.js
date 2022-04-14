@@ -3,6 +3,7 @@ const firestore = require("firebase/firestore/lite");
 const Post = require("../models/post");
 const logger = require("../utils/logger");
 const idGenerator = require("../utils/idGenerator");
+const {getAllGroupsFromDB} = require("../controllers/groupController")
 
 const addPost = async (req, res, next) => {
     try {
@@ -10,19 +11,31 @@ const addPost = async (req, res, next) => {
         data.postDate = firestore.Timestamp.fromDate(new Date(data.postDate));
         const db = firestore.getFirestore(firebase);
 
+        const author = data.postAuthor;
+        const group = data.postGroupId;
+
         data.postAuthor = firestore.doc(db, 'users/' + data.postAuthor);
 
         const comments = data.postComments;
         const tempComments = [];
         for (let i = 0; i < comments.length; i++) {
-            const temp = firestore.doc(db, 'comments/'+comments[i]);
+            const temp = firestore.doc(db, 'comments/' + comments[i]);
             tempComments.push(temp);
         }
         data.postComments = tempComments;
 
-        data.postGroupId = firestore.doc(db, 'groups/'+ data.postGroupId);
+        data.postGroupId = firestore.doc(db, 'groups/' + data.postGroupId);
         data.postId = idGenerator();
 
+        const allGroups = await getAllGroupsFromDB();
+        const filteredResult = allGroups.filter(
+            (x) => x.groupId === group && x.groupAdmin._key.path.segments[6] === author
+        );
+        if (filteredResult.length === 0) {
+            data.postSentByAdmin = false;
+        } else {
+            data.postSentByAdmin = true;
+        }
         const postsDB = firestore.doc(db, "posts", data.postId);
         await firestore.setDoc(postsDB, data);
         res.status(201).json({
@@ -93,12 +106,12 @@ const updatePost = async (req, res, next) => {
         const comments = data.postComments;
         const tempComments = [];
         for (let i = 0; i < comments.length; i++) {
-            const temp = firestore.doc(db, 'comments/'+comments[i]);
+            const temp = firestore.doc(db, 'comments/' + comments[i]);
             tempComments.push(temp);
         }
         data.postComments = tempComments;
 
-        data.postGroupId = firestore.doc(db, 'groups/'+ data.postGroupId)
+        data.postGroupId = firestore.doc(db, 'groups/' + data.postGroupId)
 
         const post = await firestore.doc(db, "posts", postId);
         await firestore.updateDoc(post, data);
@@ -186,11 +199,11 @@ const getPostsByGroupId = async (req, res, next) => {
         const groupId = req.params.groupId;
         const allPosts = await getAllPostsFromDB();
         let posts = [];
-        for (let i= 0; i< allPosts.length; i++){
+        for (let i = 0; i < allPosts.length; i++) {
             const post = allPosts[i];
             console.log(post);
             const temp = post.hasOwnProperty("postGroupId") && post.postGroupId._key.path.segments[6].trim() === groupId;
-            if (temp){
+            if (temp) {
                 posts.push(post)
             }
         }
