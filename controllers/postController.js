@@ -5,6 +5,7 @@ const logger = require("../utils/logger");
 const idGenerator = require("../utils/idGenerator");
 const axios = require('axios');
 const admin = require("../utils/firebaseService");
+const {port, host} = require('../utils/config')
 
 const getUserFcmTokens = async (groupMembers) => {
     var userIds = [];
@@ -71,7 +72,7 @@ const addPost = async (req, res, next) => {
             message: "Post added successfully!",
         });
 
-        const group = await sendGetRequest('http://localhost:3000/api/groups/' + data.postGroupId);
+        const group = await sendGetRequest(`http://${host}:${port}/api/groups/${data.postGroupId}`);
         const groupName = group.data.data.groupName
         const tokens = await getUserFcmTokens(group.data.data.groupMembers);
         await sendNotification(tokens, groupName, data.postTitle)

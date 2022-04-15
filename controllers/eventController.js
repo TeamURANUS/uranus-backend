@@ -6,6 +6,7 @@ const idGenerator = require("../utils/idGenerator");
 const admin = require("../utils/firebaseService");
 const User = require("../models/user");
 const axios = require('axios');
+const {host, port} = require('../utils/config');
 const { getAllUsersFromDB } = require('../controllers/userController');
 
 const getUserFcmTokens = async (groupMembers) => {
@@ -67,7 +68,7 @@ const addEvent = async (req, res, next) => {
     });
 
     const groupId = group.data.data.eventOrganizers._key.path.segments[6]
-    const group = await sendGetRequest('http://localhost:3000/api/groups/' + groupId);
+    const group = await sendGetRequest(`http://${host}:${port}/api/groups/${groupId}`);
     const tokens = await getUserFcmTokens(group.data.data.groupMembers);
     await sendNotification(tokens, data.organizerName, data.eventDescription)
 
