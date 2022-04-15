@@ -62,10 +62,11 @@ const insertEvent = async (event) => {
             sendUpdates: "all"
         });
 
+        //console.log(response.data.htmlLink);
         if (response["status"] === 200 && response["statusText"] === "OK") {
-            return true;
+            return response.data.htmlLink;
         } else {
-            return false;
+            return "";
         }
     } catch (error) {
         console.log(`Error at insertEvent --> ${error}`);
@@ -93,7 +94,7 @@ const getEventsFromCalendar = async () => {
             calendarId: calendarId,
         });
 
-        let items = response["data"]["items"];
+        let items = response.data.items;
         return items;
     } catch (error) {
         console.log(`Error at getEvents --> ${error}`);
@@ -131,7 +132,7 @@ const deleteEvent = async (eventId) => {
         timeZone: "Turkey",
     },
     end: {
-        dateTime: dateTime["end"],
+        dateTime: dateTime["start"],
         timeZone: "Turkey",
     },
     visibility: 'public'

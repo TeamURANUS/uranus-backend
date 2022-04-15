@@ -318,5 +318,6 @@ module.exports = {
     getGroupByAssistant,
     getGroupByMember,
     getGroupByPost,
-    getAllGroupsByUser
+    getAllGroupsByUser,
+    getAllGroupsFromDB
 };
