@@ -9,6 +9,27 @@ const axios = require('axios');
 const admin = require("../utils/firebaseService");
 const {port, host} = require('../utils/config')
 
+const addNotification = async (notification) => {
+    try {
+        notification.notifDate = firestore.Timestamp.fromDate(notification.notifDate);
+        const db = firestore.getFirestore(firebase);
+
+        const notifs = notification.notifTargetGroup;
+        const tempNotifs = [];
+        for (let i = 0; i < notifs.length; i++) {
+            const temp = firestore.doc(db, 'groups/'+ notifs[i]);
+            tempNotifs.push(temp);
+        }
+        notification.notifTargetGroup = tempNotifs;
+        notification.notifId = idGenerator();
+
+        const notificationsDB = firestore.doc(db, "notifications", notification.notifId);
+        await firestore.setDoc(notificationsDB, notification);
+    } catch (error) {
+        logger.error(error.message);
+    }
+};
+
 const getUserFcmTokens = async (groupMembers) => {
     var userIds = [];
     var tokens = []
@@ -87,9 +108,11 @@ const addPost = async (req, res, next) => {
         });
 
         const requestedGroup = await sendGetRequest(`http://${host}:${port}/api/groups/${data.postGroupId}`);
-        const groupName = requestedGroup.data.data.groupName
+        const groupName = requestedGroup.data.data.groupName;
         const tokens = await getUserFcmTokens(requestedGroup.data.data.groupMembers);
-        await sendNotification(tokens, groupName, data.postTitle)
+        await sendNotification(tokens, groupName, data.postTitle);
+        const notification = {notifDate:data.postDate, notifTargetGroup:[data.postGroupId], notifId:'', notifContent:data.postContent, notifTitle:data.postTitle};
+        await addNotification(notification);
 
     } catch (error) {
         logger.error(error.message);
