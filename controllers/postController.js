@@ -4,6 +4,49 @@ const Post = require("../models/post");
 const logger = require("../utils/logger");
 const idGenerator = require("../utils/idGenerator");
 const {getAllGroupsFromDB} = require("../controllers/groupController")
+const axios = require('axios');
+const admin = require("../utils/firebaseService");
+const {port, host} = require('../utils/config')
+
+const getUserFcmTokens = async (groupMembers) => {
+    var userIds = [];
+    var tokens = []
+    groupMembers.forEach((member) => {
+        userIds.push(member._key.path.segments[6])
+    });
+    const allUsers = await getAllUsersFromDB();
+    const users = allUsers.filter(
+      (x) => userIds.includes(x.id)
+    )
+    for (let i = 0; i < users.length; i++) {
+        if (users[i].fcmToken) {
+            tokens.push(users[i].fcmToken)
+        }
+    }
+
+    return tokens;
+};
+
+const sendGetRequest = async (url) => {
+    try {
+        const resp = await axios.get(url);
+        return resp;
+    } catch (err) {
+        console.error(err);
+    }
+};
+
+const sendNotification = async (tokens, title, body) => {
+    await admin.messaging().sendMulticast({
+        tokens: tokens,
+        notification: {
+            title: title,
+            body: body,
+        },
+    });
+};
+
+
 
 const addPost = async (req, res, next) => {
     try {
@@ -41,6 +84,12 @@ const addPost = async (req, res, next) => {
         res.status(201).json({
             message: "Post added successfully!",
         });
+
+        const requestedGroup = await sendGetRequest(`http://${host}:${port}/api/groups/${data.postGroupId}`);
+        const groupName = requestedGroup.data.data.groupName
+        const tokens = await getUserFcmTokens(requestedGroup.data.data.groupMembers);
+        await sendNotification(tokens, groupName, data.postTitle)
+
     } catch (error) {
         logger.error(error.message);
         res.status(400).json({

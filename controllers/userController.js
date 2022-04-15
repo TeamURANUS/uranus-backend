@@ -141,7 +141,8 @@ const getAllUsersFromDB = async () => {
                     doc.data().userPassword,
                     doc.data().userPhoneNumber,
                     doc.data().userSchoolMail,
-                    doc.data().userImage
+                    doc.data().userImage,
+                    doc.data().fcmToken
                 );
                 allUsers.push(user);
             });
@@ -159,5 +160,6 @@ module.exports = {
     getUser,
     updateUser,
     deleteUser,
-    getUserByEmail
+    getUserByEmail,
+    getAllUsersFromDB,
 };

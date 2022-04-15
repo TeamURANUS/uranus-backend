@@ -1,5 +1,5 @@
 class User {
-    constructor(id, userColleague, userId, userLastname, userName, userOtherMail, userPassword, userPhoneNumber, userSchoolMail, userImage) {
+    constructor(id, userColleague, userId, userLastname, userName, userOtherMail, userPassword, userPhoneNumber, userSchoolMail, userImage, fcmToken) {
         this.id = id;
         this.userColleague = userColleague;
         this.userId = userId;
@@ -10,6 +10,7 @@ class User {
         this.userPhoneNumber = userPhoneNumber;
         this.userSchoolMail = userSchoolMail;
         this.userImage = userImage;
+        this.fcmToken = fcmToken;
     }
 }
 
