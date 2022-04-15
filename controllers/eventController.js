@@ -6,6 +6,7 @@ const idGenerator = require("../utils/idGenerator");
 const admin = require("../utils/firebaseService");
 const User = require("../models/user");
 const axios = require('axios');
+const { getAllUsersFromDB } = require('../controllers/userController');
 
 const getUserFcmTokens = async (groupMembers) => {
   var userIds = [];
@@ -200,62 +201,10 @@ const getEventByOrganizer = async (req, res, next) => {
   }
 };
 
-const getAllUsersFromDB = async () => {
-  try {
-    const allUsers = [];
-
-    const db = firestore.getFirestore(firebase);
-    const usersDB = await firestore.collection(db, "users");
-    const data = await firestore.getDocs(usersDB);
-
-    if (!data.empty) {
-      data.forEach((doc) => {
-        const user = new User(
-          doc.id,
-          doc.data().userColleague,
-          doc.data().userId,
-          doc.data().userLastname,
-          doc.data().userName,
-          doc.data().userOtherMail,
-          doc.data().userPassword,
-          doc.data().userPhoneNumber,
-          doc.data().userSchoolMail,
-          doc.data().userImage,
-          doc.data().fcmToken
-        );
-        allUsers.push(user);
-      });
-    }
-    return allUsers;
-  } catch (error) {
-    logger.error(error.message);
-    return [];
-  }
-}
-
-const getGroupById = async (groupId) => {
-  try {
-    const db = firestore.getFirestore(firebase);
-    const group = await firestore.doc(db, "groups", groupId);
-    const data = await firestore.getDoc(group);
-
-    //return group
-    return data.data()
-  } catch (error) {
-    logger.error(error.message);
-    console.log(error.message);
-  }
-};
 
 
 const getEventByUser = async (req, res, next) => {
   try {
-    const groupId = 'Ox2kalDPn4an8TCb3pMu';
-    //const group = await getGroupById(groupId);
-    const group = await sendGetRequest('http://localhost:3000/api/groups/' + groupId);
-    const tokens = await getUserFcmTokens(group.data.data.groupMembers);
-    await sendNotification(tokens, 'custom nofication', 'how you doin')
-
     const userId = req.params.userId;
     const allEvents = await getAllEventsFromDB();
     let userEvents = [];
