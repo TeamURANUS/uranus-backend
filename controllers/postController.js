@@ -234,7 +234,8 @@ const getAllPostsFromDB = async () => {
                     doc.data().postDate,
                     doc.data().postId,
                     doc.data().postTitle,
-                    doc.data().postGroupId
+                    doc.data().postGroupId,
+                    doc.data().postSentByAdmin,
                 );
                 allPosts.push(post);
             });

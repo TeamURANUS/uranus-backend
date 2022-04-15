@@ -7,7 +7,8 @@ class Post {
         postDate,
         postId,
         postTitle,
-        postGroupId
+        postGroupId,
+        postSentByAdmin,
     ) {
         this.id = id;
         this.postAuthor = postAuthor;
@@ -17,6 +18,7 @@ class Post {
         this.postId = postId;
         this.postTitle = postTitle;
         this.postGroupId = postGroupId;
+        this.postSentByAdmin = postSentByAdmin;
     }
 }
 
