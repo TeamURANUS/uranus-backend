@@ -3,6 +3,47 @@ const firestore = require("firebase/firestore/lite");
 const Event = require("../models/event");
 const logger = require("../utils/logger");
 const idGenerator = require("../utils/idGenerator");
+const admin = require("../utils/firebaseService");
+const User = require("../models/user");
+const axios = require('axios');
+
+const getUserFcmTokens = async (groupMembers) => {
+  var userIds = [];
+  var tokens = []
+  groupMembers.forEach((member) => {
+    userIds.push(member._key.path.segments[6])
+  });
+  const allUsers = await getAllUsersFromDB();
+  const users = allUsers.filter(
+    (x) => userIds.includes(x.id)
+  )
+  for (let i = 0; i < users.length; i++) {
+    if (users[i].fcmToken) {
+      tokens.push(users[i].fcmToken)
+    }
+  }
+
+  return tokens;
+};
+
+const sendGetRequest = async (url) => {
+  try {
+    const resp = await axios.get(url);
+    return resp;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const sendNotification = async (tokens, title, body) => {
+  await admin.messaging().sendMulticast({
+    tokens: tokens,
+    notification: {
+      title: title,
+      body: body,
+    },
+  });
+};
 
 const addEvent = async (req, res, next) => {
   try {
@@ -23,6 +64,12 @@ const addEvent = async (req, res, next) => {
     res.status(201).json({
       message: "Event added successfully!",
     });
+
+    const groupId = group.data.data.eventOrganizers._key.path.segments[6]
+    const group = await sendGetRequest('http://localhost:3000/api/groups/' + groupId);
+    const tokens = await getUserFcmTokens(group.data.data.groupMembers);
+    await sendNotification(tokens, data.organizerName, data.eventDescription)
+
   } catch (error) {
     logger.error(error.message);
     res.status(400).json({
@@ -153,8 +200,62 @@ const getEventByOrganizer = async (req, res, next) => {
   }
 };
 
+const getAllUsersFromDB = async () => {
+  try {
+    const allUsers = [];
+
+    const db = firestore.getFirestore(firebase);
+    const usersDB = await firestore.collection(db, "users");
+    const data = await firestore.getDocs(usersDB);
+
+    if (!data.empty) {
+      data.forEach((doc) => {
+        const user = new User(
+          doc.id,
+          doc.data().userColleague,
+          doc.data().userId,
+          doc.data().userLastname,
+          doc.data().userName,
+          doc.data().userOtherMail,
+          doc.data().userPassword,
+          doc.data().userPhoneNumber,
+          doc.data().userSchoolMail,
+          doc.data().userImage,
+          doc.data().fcmToken
+        );
+        allUsers.push(user);
+      });
+    }
+    return allUsers;
+  } catch (error) {
+    logger.error(error.message);
+    return [];
+  }
+}
+
+const getGroupById = async (groupId) => {
+  try {
+    const db = firestore.getFirestore(firebase);
+    const group = await firestore.doc(db, "groups", groupId);
+    const data = await firestore.getDoc(group);
+
+    //return group
+    return data.data()
+  } catch (error) {
+    logger.error(error.message);
+    console.log(error.message);
+  }
+};
+
+
 const getEventByUser = async (req, res, next) => {
   try {
+    const groupId = 'Ox2kalDPn4an8TCb3pMu';
+    //const group = await getGroupById(groupId);
+    const group = await sendGetRequest('http://localhost:3000/api/groups/' + groupId);
+    const tokens = await getUserFcmTokens(group.data.data.groupMembers);
+    await sendNotification(tokens, 'custom nofication', 'how you doin')
+
     const userId = req.params.userId;
     const allEvents = await getAllEventsFromDB();
     let userEvents = [];
