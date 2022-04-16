@@ -1,7 +1,7 @@
 const firebase = require("../utils/firedb");
 const firestore = require("firebase/firestore/lite");
 const Group = require("../models/group");
-const logger =require("../utils/logger");
+const logger = require("../utils/logger");
 const idGenerator = require("../utils/idGenerator");
 
 const addGroup = async (req, res, next) => {
@@ -12,32 +12,45 @@ const addGroup = async (req, res, next) => {
         data.groupAdmin = firestore.doc(db, 'users/' + data.groupAdmin)
 
         const assistants = data.groupAssistants;
-        const tempAssistants = [];
-        for (let i = 0; i < assistants.length; i++) {
-            const temp = firestore.doc(db, 'users/' + assistants[i]);
-            tempAssistants.push(temp);
+        if (assistants != null) {
+            const tempAssistants = [];
+            for (let i = 0; i < assistants.length; i++) {
+                const temp = firestore.doc(db, 'users/' + assistants[i]);
+                tempAssistants.push(temp);
+            }
+            data.groupAssistants = tempAssistants;
+        } else {
+            data.groupAssistants = [];
         }
-        data.groupAssistants = tempAssistants;
 
         const members = data.groupMembers;
-        const tempMembers = [];
-        for (let i = 0; i < members.length; i++) {
-            tempMembers.push(firestore.doc(db, 'users/' + members[i]));
+        if (members != null) {
+            const tempMembers = [];
+            for (let i = 0; i < members.length; i++) {
+                tempMembers.push(firestore.doc(db, 'users/' + members[i]));
+            }
+            data.groupMembers = tempMembers;
+        } else {
+            data.groupMembers = [];
         }
-        data.groupMembers = tempMembers;
 
         const posts = data.groupPosts;
-        const tempPosts = [];
-        for (let i = 0; i < posts.length; i++) {
-            tempPosts.push(firestore.doc(db, 'posts/' + posts[i]));
+        if (posts != null) {
+            const tempPosts = [];
+            for (let i = 0; i < posts.length; i++) {
+                tempPosts.push(firestore.doc(db, 'posts/' + posts[i]));
+            }
+            data.groupPosts = tempPosts;
+        } else {
+            data.groupPosts = [];
         }
-        data.groupPosts = tempPosts;
+
         data.groupId = idGenerator();
 
         const groupsDB = firestore.doc(db, "groups", data.groupId);
         await firestore.setDoc(groupsDB, data);
         res.status(201).json({
-            message: "Group added successfully!",
+            message: `Group added successfully! ${data.groupId}`,
         });
     } catch (error) {
         logger.error(error.message);
@@ -98,29 +111,56 @@ const updateGroup = async (req, res, next) => {
         const data = req.body;
         const db = firestore.getFirestore(firebase);
 
-        data.groupAdmin = firestore.doc(db, 'users/' + data.groupAdmin)
+        if (data.groupAdmin != null)
+            data.groupAdmin = firestore.doc(db, 'users/' + data.groupAdmin)
+        else {
+            const group = await firestore.doc(db, "groups", groupId);
+            const groupData = await firestore.getDoc(group);
+            data.groupAdmin = groupData.data().groupAdmin;
+        }
 
         const assistants = data.groupAssistants;
-        const tempAssistants = [];
-        for (let i = 0; i < assistants.length; i++) {
-            const temp = firestore.doc(db, 'users/' + assistants[i]);
-            tempAssistants.push(temp);
+
+        if (assistants != null) {
+            const tempAssistants = [];
+            for (let i = 0; i < assistants.length; i++) {
+                const temp = firestore.doc(db, 'users/' + assistants[i]);
+                tempAssistants.push(temp);
+            }
+            data.groupAssistants = tempAssistants;
+        } else {
+            const group = await firestore.doc(db, "groups/" + groupId);
+            const groupData = await firestore.getDoc(group);
+            data.groupAssistants = groupData.data().groupAssistants;
         }
-        data.groupAssistants = tempAssistants;
 
         const members = data.groupMembers;
-        const tempMembers = [];
-        for (let i = 0; i < members.length; i++) {
-            tempMembers.push(firestore.doc(db, 'users/' + members[i]));
+
+        if (members != null) {
+            const tempMembers = [];
+            for (let i = 0; i < members.length; i++) {
+                tempMembers.push(firestore.doc(db, 'users/' + members[i]));
+            }
+            data.groupMembers = tempMembers;
+        } else {
+            const group = await firestore.doc(db, "groups/" + groupId);
+            const groupData = await firestore.getDoc(group);
+            data.groupMembers = groupData.data().groupMembers;
         }
-        data.groupMembers = tempMembers;
 
         const posts = data.groupPosts;
-        const tempPosts = [];
-        for (let i = 0; i < posts.length; i++) {
-            tempPosts.push(firestore.doc(db, 'posts/' + posts[i]));
+
+        if (posts != null) {
+            const tempPosts = [];
+            for (let i = 0; i < posts.length; i++) {
+                tempPosts.push(firestore.doc(db, 'posts/' + posts[i]));
+            }
+            data.groupPosts = tempPosts;
+        } else {
+            const group = await firestore.doc(db, "groups/" + groupId);
+            const groupData = await firestore.getDoc(group);
+            data.groupPosts = groupData.data().groupPosts;
         }
-        data.groupPosts = tempPosts;
 
         const group = await firestore.doc(db, "groups", groupId);
         await firestore.updateDoc(group, data);
