@@ -107,7 +107,7 @@ const addPost = async (req, res, next) => {
         const postsDB = firestore.doc(db, "posts", data.postId);
         await firestore.setDoc(postsDB, data);
         res.status(201).json({
-            message: "Post added successfully!",
+            message: `Post added successfully! ${data.postId}`,
         });
 
         const requestedGroup = await sendGetRequest(`http://${host}:${port}/api/groups/${group}`);
@@ -180,20 +180,36 @@ const updatePost = async (req, res, next) => {
     try {
         const postId = req.params.postId;
         const data = req.body;
-        data.postDate = firestore.Timestamp.fromDate(new Date(data.postDate));
         const db = firestore.getFirestore(firebase);
 
-        data.postAuthor = firestore.doc(db, 'users/' + data.postAuthor);
+        const date = data.postDate;
+        if (date != null) {
+            data.postDate = firestore.Timestamp.fromDate(new Date(data.postDate));
+        }
+
+        const author = data.postAuthor;
+        if (author != null) {
+            data.postAuthor = firestore.doc(db, 'users/' + data.postAuthor);
+        }
 
         const comments = data.postComments;
-        const tempComments = [];
-        for (let i = 0; i < comments.length; i++) {
-            const temp = firestore.doc(db, 'comments/' + comments[i]);
-            tempComments.push(temp);
+        if (comments != null) {
+            const tempComments = [];
+            for (let i = 0; i < comments.length; i++) {
+                const temp = firestore.doc(db, 'comments/' + comments[i]);
+                tempComments.push(temp);
+            }
+            data.postComments = tempComments;
+        } else {
+            const post = await firestore.doc(db, "posts/" + postId);
+            const postData = await firestore.getDoc(post);
+            data.postComments = postData.data().postComments;
         }
-        data.postComments = tempComments;
 
-        data.postGroupId = firestore.doc(db, 'groups/' + data.postGroupId)
+        const groupId = data.postGroupId;
+        if (groupId != null) {
+            data.postGroupId = firestore.doc(db, 'groups/' + data.postGroupId)
+        }
 
         const post = await firestore.doc(db, "posts", postId);
         await firestore.updateDoc(post, data);
