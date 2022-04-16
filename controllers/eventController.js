@@ -8,57 +8,55 @@ const admin = require("../utils/firebaseService");
 const User = require("../models/user");
 const axios = require('axios');
 const {host, port} = require('../utils/config');
-const { getAllUsersFromDB } = require('../controllers/userController');
+const {getAllUsersFromDB} = require('../controllers/userController');
 
 const getUserFcmTokens = async (groupMembers) => {
-  var userIds = [];
-  var tokens = []
-  groupMembers.forEach((member) => {
-    userIds.push(member._key.path.segments[6])
-  });
-  const allUsers = await getAllUsersFromDB();
-  const users = allUsers.filter(
-    (x) => userIds.includes(x.id)
-  )
-  for (let i = 0; i < users.length; i++) {
-    if (users[i].fcmToken) {
-      tokens.push(users[i].fcmToken)
+    var userIds = [];
+    var tokens = []
+    groupMembers.forEach((member) => {
+        userIds.push(member._key.path.segments[6])
+    });
+    const allUsers = await getAllUsersFromDB();
+    const users = allUsers.filter(
+        (x) => userIds.includes(x.id)
+    )
+    for (let i = 0; i < users.length; i++) {
+        if (users[i].fcmToken) {
+            tokens.push(users[i].fcmToken)
+        }
     }
-  }
 
-  return tokens;
+    return tokens;
 };
 
 const sendGetRequest = async (url) => {
-  try {
-    const resp = await axios.get(url);
-    return resp;
-  } catch (err) {
-    console.error(err);
-  }
+    try {
+        const resp = await axios.get(url);
+        return resp;
+    } catch (err) {
+        console.error(err);
+    }
 };
 
 const sendNotification = async (tokens, title, body) => {
-  await admin.messaging().sendMulticast({
-    tokens: tokens,
-    notification: {
-      title: title,
-      body: body,
-    },
-  });
+    await admin.messaging().sendMulticast({
+        tokens: tokens,
+        notification: {
+            title: title,
+            body: body,
+        },
+    });
 };
 
 const addNotification = async (notification) => {
-  try {
-    const db = firestore.getFirestore(firebase);
-
-    notification.notifId = idGenerator();
-
-    const notificationsDB = firestore.doc(db, "notifications", notification.notifId);
-    await firestore.setDoc(notificationsDB, notification);
-  } catch (error) {
-    logger.error(error.message);
-  }
+    try {
+        const db = firestore.getFirestore(firebase);
+        notification.notifId = idGenerator();
+        const notificationsDB = firestore.doc(db, "notifications", notification.notifId);
+        await firestore.setDoc(notificationsDB, notification);
+    } catch (error) {
+        logger.error(error.message);
+    }
 };
 
 
@@ -67,9 +65,14 @@ const addEvent = async (req, res, next) => {
         const data = req.body;
         const db = firestore.getFirestore(firebase);
 
-      const groupId = data.eventOrganizers;
+        const groupId = data.eventOrganizers[0];
+        const organizers = data.eventOrganizers;
+        const tempOrganizers = [];
+        for (let i = 0; i < organizers.length; i++) {
+            tempOrganizers.push(firestore.doc(db, 'groups/' + organizers[i]));
+        }
+        data.eventOrganizers = tempOrganizers;
 
-      data.eventOrganizers = firestore.doc(db, 'groups/' + data.eventOrganizers)
         const participants = data.eventParticipants;
         const temp = [];
         for (let i = 0; i < participants.length; i++) {
@@ -97,15 +100,20 @@ const addEvent = async (req, res, next) => {
         const eventsDB = firestore.doc(db, "events", data.eventId);
         await firestore.setDoc(eventsDB, data);
         res.status(201).json({
-            message: "Event added successfully!",
+            message: `Event added successfully! ${data.eventId}`,
         });
 
-      const group = await sendGetRequest(`http://${host}:${port}/api/groups/${groupId}`);
-      const tokens = await getUserFcmTokens(group.data.data.groupMembers);
-      await sendNotification(tokens, data.organizerName, data.eventDescription);
-      const notification = {notifDate:data.eventDate, notifTargetGroup:[data.eventOrganizers], notifId:'', notifContent:data.eventDescription, notifTitle:data.eventName};
-      console.log(notification);
-      await addNotification(notification);
+        const group = await sendGetRequest(`http://${host}:${port}/api/groups/${groupId}`);
+        const tokens = await getUserFcmTokens(group.data.data.groupMembers);
+        await sendNotification(tokens, data.organizerName, data.eventDescription);
+        const notification = {
+            notifDate: data.eventDate,
+            notifTargetGroup: [data.eventOrganizers[0]],
+            notifId: '',
+            notifContent: data.eventDescription,
+            notifTitle: data.organizerName
+        };
+        await addNotification(notification);
 
     } catch (error) {
         logger.error(error.message);
