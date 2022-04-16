@@ -3,6 +3,7 @@ const firestore = require("firebase/firestore/lite");
 const New = require("../models/new");
 const logger = require("../utils/logger");
 const idGenerator = require("../utils/idGenerator");
+const {latestNewScrapper, subNewScrapper} = require("../utils/etuNewsScraper");
 
 const addNew = async (req, res, next) => {
     try {
@@ -25,6 +26,14 @@ const addNew = async (req, res, next) => {
         });
     }
 };
+
+const scrapeNews = async (req, res) => {
+    latestNewScrapper();
+    subNewScrapper();
+    res.status(201).json({
+        message: "Scraped successfully!",
+    });
+}
 
 const getAllNews = async (req, res, next) => {
     try {
@@ -172,5 +181,6 @@ module.exports = {
     getNew,
     updateNew,
     deleteNew,
-    getNewsByAuthor
+    getNewsByAuthor,
+    scrapeNews
 };
