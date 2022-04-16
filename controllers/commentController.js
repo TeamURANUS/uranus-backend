@@ -14,7 +14,7 @@ const addComment = async (req, res, next) => {
     const commentsDB = firestore.doc(db, "comments", data.commentId);
     await firestore.setDoc(commentsDB, data);
     res.status(201).json({
-      message: "comment created",
+      message: `comment created ${data.commentId}`,
     });
   } catch (error) {
     logger.error(error.message);
