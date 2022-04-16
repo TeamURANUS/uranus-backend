@@ -172,15 +172,39 @@ const updateEvent = async (req, res, next) => {
     try {
         const eventId = req.params.eventId;
         const data = req.body;
-        data.eventDate = firestore.Timestamp.fromDate(new Date(data.eventDate));
         const db = firestore.getFirestore(firebase);
-        data.eventOrganizers = firestore.doc(db, 'groups/' + data.eventOrganizers)
-        const participants = data.eventParticipants;
-        const temp = [];
-        for (let i = 0; i < participants.length; i++) {
-            temp.push(firestore.doc(db, 'users/' + participants[i]))
+
+        const date = data.eventDate;
+        if (date != null) {
+            data.eventDate = firestore.Timestamp.fromDate(new Date(data.eventDate));
         }
-        data.eventParticipants = temp;
+
+        const organizers = data.eventOrganizers;
+        if (organizers != null) {
+            const tempOrganizers = [];
+            for (let i = 0; i < organizers.length; i++) {
+                tempOrganizers.push(firestore.doc(db, 'groups/' + organizers[i]));
+            }
+            data.eventOrganizers = tempOrganizers;
+        } else {
+            const event = await firestore.doc(db, "events/" + eventId);
+            const eventData = await firestore.getDoc(event);
+            data.eventOrganizers = eventData.data().eventOrganizers;
+        }
+
+        const participants = data.eventParticipants;
+        if (participants != null) {
+            const temp = [];
+            for (let i = 0; i < participants.length; i++) {
+                temp.push(firestore.doc(db, 'users/' + participants[i]))
+            }
+            data.eventParticipants = temp;
+        } else {
+            const event = await firestore.doc(db, "events/"+ eventId);
+            const eventData = await firestore.getDoc(event);
+            data.eventParticipants = eventData.data().eventParticipants;
+        }
+
         const event = await firestore.doc(db, "events", eventId);
         await firestore.updateDoc(event, data);
 
