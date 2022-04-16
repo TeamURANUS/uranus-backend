@@ -8,10 +8,10 @@ const {latestNewScrapper, subNewScrapper} = require("../utils/etuNewsScraper");
 const addNew = async (req, res, next) => {
     try {
         const data = req.body;
-        data.documentDate = firestore.Timestamp.fromDate(new Date(data.documentDate));
         const db = firestore.getFirestore(firebase);
 
-        data.documentAuthor = firestore.doc(db, 'users/' + data.documentAuthor);
+        data.documentDate = firestore.Timestamp.fromDate(new Date(data.documentDate));
+        data.documentAuthor = "TOBB ETU"
         data.documentId = idGenerator();
 
         const newsDB = firestore.doc(db, "news", data.documentId);
