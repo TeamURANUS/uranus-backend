@@ -17,7 +17,7 @@ const addNotification = async (notification) => {
         const notifs = notification.notifTargetGroup;
         const tempNotifs = [];
         for (let i = 0; i < notifs.length; i++) {
-            const temp = firestore.doc(db, 'groups/'+ notifs[i]);
+            const temp = firestore.doc(db, 'groups/' + notifs[i]);
             tempNotifs.push(temp);
         }
         notification.notifTargetGroup = tempNotifs;
@@ -38,7 +38,7 @@ const getUserFcmTokens = async (groupMembers) => {
     });
     const allUsers = await getAllUsersFromDB();
     const users = allUsers.filter(
-      (x) => userIds.includes(x.id)
+        (x) => userIds.includes(x.id)
     )
     for (let i = 0; i < users.length; i++) {
         if (users[i].fcmToken) {
@@ -69,7 +69,6 @@ const sendNotification = async (tokens, title, body) => {
 };
 
 
-
 const addPost = async (req, res, next) => {
     try {
         const data = req.body;
@@ -82,12 +81,16 @@ const addPost = async (req, res, next) => {
         data.postAuthor = firestore.doc(db, 'users/' + data.postAuthor);
 
         const comments = data.postComments;
-        const tempComments = [];
-        for (let i = 0; i < comments.length; i++) {
-            const temp = firestore.doc(db, 'comments/' + comments[i]);
-            tempComments.push(temp);
+        if (comments != null) {
+            const tempComments = [];
+            for (let i = 0; i < comments.length; i++) {
+                const temp = firestore.doc(db, 'comments/' + comments[i]);
+                tempComments.push(temp);
+            }
+            data.postComments = tempComments;
+        } else {
+            data.postComments = [];
         }
-        data.postComments = tempComments;
 
         data.postGroupId = firestore.doc(db, 'groups/' + data.postGroupId);
         data.postId = idGenerator();
@@ -107,11 +110,17 @@ const addPost = async (req, res, next) => {
             message: "Post added successfully!",
         });
 
-        const requestedGroup = await sendGetRequest(`http://${host}:${port}/api/groups/${data.postGroupId}`);
+        const requestedGroup = await sendGetRequest(`http://${host}:${port}/api/groups/${group}`);
         const groupName = requestedGroup.data.data.groupName;
         const tokens = await getUserFcmTokens(requestedGroup.data.data.groupMembers);
         await sendNotification(tokens, groupName, data.postTitle);
-        const notification = {notifDate:data.postDate, notifTargetGroup:[data.postGroupId], notifId:'', notifContent:data.postContent, notifTitle:data.postTitle};
+        const notification = {
+            notifDate: data.postDate,
+            notifTargetGroup: [data.postGroupId],
+            notifId: '',
+            notifContent: data.postContent,
+            notifTitle: data.postTitle
+        };
         await addNotification(notification);
 
     } catch (error) {
