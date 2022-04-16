@@ -50,16 +50,8 @@ const sendNotification = async (tokens, title, body) => {
 
 const addNotification = async (notification) => {
   try {
-    notification.notifDate = firestore.Timestamp.fromDate(new Date(notification.notifDate));
     const db = firestore.getFirestore(firebase);
 
-    const notifs = notification.notifTargetGroup;
-    const tempNotifs = [];
-    for (let i = 0; i < notifs.length; i++) {
-      const temp = firestore.doc(db, 'groups/'+ notifs[i]);
-      tempNotifs.push(temp);
-    }
-    notification.notifTargetGroup = tempNotifs;
     notification.notifId = idGenerator();
 
     const notificationsDB = firestore.doc(db, "notifications", notification.notifId);
@@ -74,7 +66,10 @@ const addEvent = async (req, res, next) => {
     try {
         const data = req.body;
         const db = firestore.getFirestore(firebase);
-        data.eventOrganizers = firestore.doc(db, 'groups/' + data.eventOrganizers)
+
+      const groupId = data.eventOrganizers;
+
+      data.eventOrganizers = firestore.doc(db, 'groups/' + data.eventOrganizers)
         const participants = data.eventParticipants;
         const temp = [];
         for (let i = 0; i < participants.length; i++) {
@@ -105,11 +100,11 @@ const addEvent = async (req, res, next) => {
             message: "Event added successfully!",
         });
 
-      const groupId = group.data.data.eventOrganizers._key.path.segments[6];
       const group = await sendGetRequest(`http://${host}:${port}/api/groups/${groupId}`);
       const tokens = await getUserFcmTokens(group.data.data.groupMembers);
       await sendNotification(tokens, data.organizerName, data.eventDescription);
       const notification = {notifDate:data.eventDate, notifTargetGroup:[data.eventOrganizers], notifId:'', notifContent:data.eventDescription, notifTitle:data.eventName};
+      console.log(notification);
       await addNotification(notification);
 
     } catch (error) {

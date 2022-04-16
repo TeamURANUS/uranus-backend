@@ -11,16 +11,8 @@ const {port, host} = require('../utils/config')
 
 const addNotification = async (notification) => {
     try {
-        notification.notifDate = firestore.Timestamp.fromDate(notification.notifDate);
         const db = firestore.getFirestore(firebase);
 
-        const notifs = notification.notifTargetGroup;
-        const tempNotifs = [];
-        for (let i = 0; i < notifs.length; i++) {
-            const temp = firestore.doc(db, 'groups/' + notifs[i]);
-            tempNotifs.push(temp);
-        }
-        notification.notifTargetGroup = tempNotifs;
         notification.notifId = idGenerator();
 
         const notificationsDB = firestore.doc(db, "notifications", notification.notifId);
