@@ -72,9 +72,18 @@ const updateComment = async (req, res, next) => {
   try {
     const commentId = req.params.commentId;
     const data = req.body;
-    data.commentDate = firestore.Timestamp.fromDate(new Date(data.commentDate));
     const db = firestore.getFirestore(firebase);
-    data.commentAuthor = firestore.doc(db, 'users/' + data.commentAuthor);
+
+    const date = data.commentDate;
+    if (date != null){
+        data.commentDate = firestore.Timestamp.fromDate(new Date(data.commentDate));
+    }
+
+    const author = data.commentAuthor;
+    if (author != null){
+        data.commentAuthor = firestore.doc(db, 'users/' + data.commentAuthor);
+    }
+
     const comment = await firestore.doc(db, "comments", commentId);
     await firestore.updateDoc(comment, data);
 
