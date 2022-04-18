@@ -102,9 +102,11 @@ const addPost = async (req, res, next) => {
             message: `Post added successfully! ${data.postId}`,
         });
 
-        const requestedGroup = await sendGetRequest(`http://${host}:${port}/api/groups/${group}`);
-        const groupName = requestedGroup.data.data.groupName;
-        const tokens = await getUserFcmTokens(requestedGroup.data.data.groupMembers);
+
+        let requestedGroup = await sendGetRequest(`http://${host}:${port}/api/groups/${group}`);
+        requestedGroup = requestedGroup.data.data;
+        const groupName = requestedGroup.groupName;
+        const tokens = await getUserFcmTokens(requestedGroup.groupMembers.concat(requestedGroup.groupAssistants).concat([requestedGroup.groupAdmin]));
         await sendNotification(tokens, groupName, data.postTitle);
         const notification = {
             notifDate: data.postDate,
