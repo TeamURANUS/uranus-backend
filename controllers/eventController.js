@@ -103,8 +103,9 @@ const addEvent = async (req, res, next) => {
             message: `Event added successfully! ${data.eventId}`,
         });
 
-        const group = await sendGetRequest(`http://${host}:${port}/api/groups/${groupId}`);
-        const tokens = await getUserFcmTokens(group.data.data.groupMembers);
+        let group = await sendGetRequest(`http://${host}:${port}/api/groups/${groupId}`);
+        group = group.data.data;
+        const tokens = await getUserFcmTokens(group.groupMembers.concat(group.groupAssistants).concat([group.groupAdmin]));
         await sendNotification(tokens, data.organizerName, data.eventDescription);
         const notification = {
             notifDate: data.eventDate,
